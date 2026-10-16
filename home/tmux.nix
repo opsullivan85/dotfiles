@@ -15,6 +15,20 @@
     aggressiveResize = true;
 
     extraConfig = ''
+      # New splits/windows open in the current pane's directory
+      bind '"' split-window -c "#{pane_current_path}"
+      bind % split-window -h -c "#{pane_current_path}"
+      bind c new-window -c "#{pane_current_path}"
+
+      # Status bar content (colors come from Stylix). The battery segment
+      # prints nothing on machines without /sys/class/power_supply/BAT*,
+      # so this stays portable to desktops.
+      set -g status-interval 15
+      set -g status-left-length 30
+      set -g status-right-length 60
+      set -g status-left " #S  "
+      set -g status-right "#(cat /sys/class/power_supply/BAT*/capacity 2>/dev/null | head -1 | sed 's/$/%%  /')%a %d %b  %H:%M "
+
       set -g renumber-windows on
       set -g focus-events on
       setw -g pane-base-index 1
