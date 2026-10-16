@@ -47,6 +47,10 @@
 
   services.printing.enable = true;
 
+  # Built-in panel brightness: brightnessctl ships udev rules that make the
+  # backlight writable by the "video" group (so no sudo needed).
+  services.udev.packages = [ pkgs.brightnessctl ];
+
   # Noctalia (desktop shell on top of niri) wants these for its
   # wifi/bluetooth/power/battery widgets.
   hardware.bluetooth.enable = true;
@@ -69,7 +73,7 @@
   users.users."owen" = {
     isNormalUser = true;
     description = "Owen";
-    extraGroups = [ "networkmanager" "wheel" ];
+    extraGroups = [ "networkmanager" "wheel" "video" ];
     shell = pkgs.zsh;
   };
 
@@ -101,6 +105,7 @@
   environment.systemPackages = with pkgs; [
     vim
     wget
+    brightnessctl
   ];
 
   system.stateVersion = "26.05";
