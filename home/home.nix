@@ -12,6 +12,7 @@
     ./nvim.nix
     ./niri.nix
     ./noctalia.nix
+    ./dev
   ];
 
   home.packages = with pkgs; [
