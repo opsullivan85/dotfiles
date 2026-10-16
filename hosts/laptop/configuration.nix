@@ -1,9 +1,14 @@
-{ config, pkgs, theme, ... }:
+{
+  config,
+  pkgs,
+  theme,
+  ...
+}:
 
 {
-  imports =
-    [ ./hardware-configuration.nix
-    ];
+  imports = [
+    ./hardware-configuration.nix
+  ];
 
   boot.loader.systemd-boot.enable = true;
   boot.loader.efi.canTouchEfiVariables = true;
@@ -73,7 +78,11 @@
   users.users."owen" = {
     isNormalUser = true;
     description = "Owen";
-    extraGroups = [ "networkmanager" "wheel" "video" ];
+    extraGroups = [
+      "networkmanager"
+      "wheel"
+      "video"
+    ];
     shell = pkgs.zsh;
   };
 
@@ -95,8 +104,16 @@
 
   # Prebuilt Noctalia binaries instead of compiling its C++/Qt core locally.
   nix.settings = {
+    # So the plain `nix` CLI (nix develop, nix fmt, nix flake check) works;
+    # nixos-rebuild enables these for itself, which hid that they were off.
+    experimental-features = [
+      "nix-command"
+      "flakes"
+    ];
     extra-substituters = [ "https://noctalia.cachix.org" ];
-    extra-trusted-public-keys = [ "noctalia.cachix.org-1:pCOR47nnMEo5thcxNDtzWpOxNFQsBRglJzxWPp3dkU4=" ];
+    extra-trusted-public-keys = [
+      "noctalia.cachix.org-1:pCOR47nnMEo5thcxNDtzWpOxNFQsBRglJzxWPp3dkU4="
+    ];
   };
 
   # Kept to the minimum you'd want even if home-manager were completely

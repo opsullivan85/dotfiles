@@ -1,0 +1,4 @@
+# Dotted/repeated attribute paths read better in NixOS/home-manager configs
+# than forcing everything into one nested set.
+disabled = ["repeated_keys"]
+ignore = ["hosts/laptop/hardware-configuration.nix"]

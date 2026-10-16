@@ -7,7 +7,11 @@ let
   # asks tmux for that pane's path.
   dupTerminal = pkgs.writeShellApplication {
     name = "dup-terminal";
-    runtimeInputs = [ pkgs.jq pkgs.procps pkgs.tmux ];
+    runtimeInputs = [
+      pkgs.jq
+      pkgs.procps
+      pkgs.tmux
+    ];
     text = ''
       descendants() {
         echo "$1"
@@ -39,10 +43,26 @@ in
       # Colors + font come from Stylix (hosts/laptop/configuration.nix)
       # now, not set here.
       keyboard.bindings = [
-        { key = "Equals"; mods = "Control|Shift"; action = "IncreaseFontSize"; }
-        { key = "Plus";   mods = "Control|Shift"; action = "IncreaseFontSize"; }
-        { key = "Minus";  mods = "Control|Shift"; action = "DecreaseFontSize"; }
-        { key = "Key0";   mods = "Control|Shift"; action = "ResetFontSize"; }
+        {
+          key = "Equals";
+          mods = "Control|Shift";
+          action = "IncreaseFontSize";
+        }
+        {
+          key = "Plus";
+          mods = "Control|Shift";
+          action = "IncreaseFontSize";
+        }
+        {
+          key = "Minus";
+          mods = "Control|Shift";
+          action = "DecreaseFontSize";
+        }
+        {
+          key = "Key0";
+          mods = "Control|Shift";
+          action = "ResetFontSize";
+        }
       ];
     };
   };

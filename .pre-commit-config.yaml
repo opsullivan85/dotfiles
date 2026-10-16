@@ -1,0 +1,72 @@
+# Hooks run through scripts/in-devshell, so the tools come from the flake's
+# devShell (pinned by flake.lock) rather than being downloaded by pre-commit.
+# Install once with `./bootstrap` (or `pre-commit install --install-hooks`).
+default_install_hook_types: [pre-commit, pre-push]
+repos:
+  - repo: local
+    hooks:
+      - id: nixfmt
+        name: nixfmt
+        entry: scripts/in-devshell nixfmt
+        language: system
+        files: \.nix$
+        exclude: hardware-configuration\.nix$
+
+      - id: statix
+        name: statix
+        # statix takes a single target, so check the whole (small) repo.
+        entry: scripts/in-devshell statix check .
+        language: system
+        files: \.nix$
+        pass_filenames: false
+
+      - id: deadnix
+        name: deadnix
+        # -L: unused module args ({ config, pkgs, ... }:) are idiomatic.
+        entry: scripts/in-devshell deadnix --fail -L
+        language: system
+        files: \.nix$
+        exclude: hardware-configuration\.nix$
+
+      - id: ruff-check
+        name: ruff check
+        entry: scripts/in-devshell ruff check --fix
+        language: system
+        types: [python]
+
+      - id: ruff-format
+        name: ruff format
+        entry: scripts/in-devshell ruff format
+        language: system
+        types: [python]
+
+      - id: stylua
+        name: stylua
+        entry: scripts/in-devshell stylua
+        language: system
+        files: ^nvim/.*\.lua$
+
+      - id: shellcheck
+        name: shellcheck
+        entry: scripts/in-devshell shellcheck
+        language: system
+        types: [shell]
+        exclude: \.zsh$
+
+      - id: flake-check
+        name: nix flake check
+        entry: nix --extra-experimental-features "nix-command flakes" flake check
+        language: system
+        pass_filenames: false
+        always_run: true
+        stages: [pre-push]
+
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v5.0.0
+    hooks:
+      - id: end-of-file-fixer
+        exclude: ^nvim/lazy-lock\.json$
+      - id: trailing-whitespace
+        exclude: \.zsh$
+      - id: check-merge-conflict
+      - id: check-added-large-files

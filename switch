@@ -1,18 +1,229 @@
-#!/usr/bin/env bash
-# Stage first (flakes only see git-tracked files, even uncommitted ones —
-# an untracked file is invisible to Nix), then build + activate, then commit
-# — but only if the switch actually succeeded, so broken configs never land
-# in history.
-set -euo pipefail
-cd "$(dirname "$0")"
+#!/usr/bin/env python3
+"""Rebuild this machine from the flake, then commit the config that built.
 
-git add -A
+Stages everything first (flakes only see git-tracked files), runs the
+pre-commit checks, builds + activates, and commits only if that worked, so
+broken configs never land in history. Nix's noisy output goes to a log
+under ~/.local/state/dotfiles/logs; the terminal gets a summary.
+"""
 
-sudo nixos-rebuild switch --flake .#laptop "$@"
+from __future__ import annotations
 
-if git diff --cached --quiet; then
-  echo "No changes to commit."
-else
-  gen=$(readlink /nix/var/nix/profiles/system | sed -E 's/^system-([0-9]+)-link$/\1/')
-  git commit -m "rebuild: generation ${gen}"
-fi
+import argparse
+import os
+import re
+import socket
+import sys
+import time
+from pathlib import Path
+
+from dotlib import ui
+
+REPO = Path(__file__).resolve().parent
+NIX = ["nix", "--extra-experimental-features", "nix-command flakes"]
+DEFAULT_NIXOS_HOST = "laptop"
+DEFAULT_HM_TARGET = "owen@work-laptop"
+IS_NIXOS = Path("/etc/NIXOS").exists()
+
+
+def git(*args: str) -> ui.Result:
+    return ui.run("git " + args[0], ["git", *args], cwd=REPO, verbose=False)
+
+
+def parse() -> tuple[argparse.Namespace, list[str]]:
+    p = argparse.ArgumentParser(
+        prog="switch",
+        description="Rebuild this machine from the flake and commit the result.",
+        epilog="Unknown flags are passed through to nixos-rebuild / home-manager.",
+    )
+    p.add_argument("message", nargs="?", help="commit message (default: 'rebuild: generation N')")
+    p.add_argument(
+        "-b",
+        "--boot",
+        action="store_true",
+        help="activate on next boot instead of now (NixOS)",
+    )
+    p.add_argument("-n", "--no-commit", action="store_true", help="rebuild but don't commit")
+    p.add_argument("--no-check", action="store_true", help="skip the pre-commit checks")
+    p.add_argument(
+        "-t",
+        "--target",
+        help="flake output to build (default: laptop on NixOS, owen@work-laptop elsewhere)",
+    )
+    p.add_argument(
+        "-v",
+        "--verbose",
+        action="store_true",
+        help="stream full Nix output instead of a spinner",
+    )
+    return p.parse_known_args()
+
+
+def stage() -> bool:
+    res = git("add", "-A")
+    if not res.ok:
+        ui.line(ui.FAIL, "Staging failed")
+        ui.note(res.text)
+        return False
+    changed = ui.capture(["git", "diff", "--cached", "--name-only"], cwd=REPO).splitlines()
+    ui.line(
+        ui.OK,
+        "Staged",
+        f"{len(changed)} changed file{'s' if len(changed) != 1 else ''}" if changed else "no changes",
+    )
+    return True
+
+
+def checks(log: Path, verbose: bool) -> bool:
+    """Run the pre-commit hooks on staged files; one retry after auto-fixes."""
+    cmd = [REPO / "scripts/in-devshell", "pre-commit", "run"]
+    res = ui.run("Checking", cmd, log=log, verbose=verbose, cwd=REPO)
+    if not res.ok and ui.capture(["git", "diff", "--name-only"], cwd=REPO):
+        git("add", "-A")  # formatters rewrote files; take their fixes
+        res = ui.run("Checking (after auto-fixes)", cmd, log=log, verbose=verbose, cwd=REPO)
+        if res.ok:
+            ui.line(
+                ui.OK,
+                "Checks",
+                f"passed after auto-formatting  ·  {ui.fmt_duration(res.seconds)}",
+            )
+            return True
+    if res.ok:
+        ui.line(ui.OK, "Checks", ui.fmt_duration(res.seconds))
+        return True
+    ui.line(ui.FAIL, "Checks failed")
+    failed = [ui.strip_ansi(r) for r in res.lines if r.strip() and not r.startswith("[")]
+    ui.note("\n".join(failed[-25:]))
+    return False
+
+
+def build_command(args: argparse.Namespace, extra: list[str]) -> tuple[list[str], str]:
+    if IS_NIXOS:
+        target = args.target or DEFAULT_NIXOS_HOST
+        verb = "boot" if args.boot else "switch"
+        return [
+            "sudo",
+            "nixos-rebuild",
+            verb,
+            "--flake",
+            f".#{target}",
+            *extra,
+        ], f"NixOS · {target}"
+    target = args.target or DEFAULT_HM_TARGET
+    return [
+        "home-manager",
+        "switch",
+        "--flake",
+        f".#{target}",
+        *extra,
+    ], f"home-manager · {target}"
+
+
+def generation() -> str:
+    """Current system (NixOS) or home-manager generation number, if known."""
+    if IS_NIXOS:
+        link = os.readlink("/nix/var/nix/profiles/system")
+    else:
+        profiles = Path.home() / ".local/state/nix/profiles"
+        link = os.readlink(profiles / "home-manager") if (profiles / "home-manager").is_symlink() else ""
+    match = re.search(r"-(\d+)-link$", link)
+    return match.group(1) if match else ""
+
+
+def show_changes(before: str) -> None:
+    after = os.path.realpath("/run/current-system")
+    if not before or before == after:
+        ui.line(ui.INFO, "No package changes")
+        return
+    diff = ui.run("Comparing closures", [*NIX, "store", "diff-closures", before, after])
+    rows = [r for r in diff.lines if r.strip()]
+    if not rows:
+        ui.line(ui.INFO, "Configuration changed, no package version changes")
+        return
+    ui.line(ui.INFO, f"{len(rows)} package change{'s' if len(rows) != 1 else ''}")
+    for row in rows[:12]:
+        print(f"      {ui.fit(row, ui.width() - 8)}")
+    if len(rows) > 12:
+        ui.note(f"… and {len(rows) - 12} more (nix store diff-closures)", indent=6)
+
+
+def commit(message: str | None, gen: str, ran_checks: bool) -> bool:
+    if not ui.capture(["git", "diff", "--cached", "--name-only"], cwd=REPO):
+        ui.line(ui.SKIP, "Nothing to commit")
+        return True
+    auto = f"rebuild: generation {gen}" if gen else "rebuild"
+    text = f"{message}\n\n{auto}" if message else auto
+    cmd = ["git", "commit", "-m", text]
+    if ran_checks:
+        cmd.append("--no-verify")  # hooks just passed on exactly these files
+    res = ui.run("Committing", cmd, cwd=REPO)
+    if not res.ok:
+        ui.line(ui.FAIL, "Commit failed (the system itself was switched fine)")
+        ui.note(res.text)
+        return False
+    short = ui.capture(["git", "rev-parse", "--short", "HEAD"], cwd=REPO)
+    ui.line(ui.OK, "Committed", f"{short}  {message or auto}")
+    return True
+
+
+def main() -> int:
+    args, extra = parse()
+    os.chdir(REPO)
+    cmd, where = build_command(args, extra)
+    ui.header("switch", f"{where}  ·  {socket.gethostname()}")
+    log = ui.new_log("switch")
+    started = time.monotonic()
+
+    if not stage():
+        return 1
+    ran_checks = False
+    if not args.no_check:
+        if not checks(log, args.verbose):
+            ui.note(f"Full log: {ui.pretty_path(log)}")
+            return 1
+        ran_checks = True
+
+    # Prompt for the password up front, where the prompt is visible,
+    # rather than inside the spinner.
+    if cmd[0] == "sudo" and ui.run_interactive(["sudo", "-v"]) != 0:
+        ui.line(ui.FAIL, "sudo authentication failed")
+        return 1
+
+    before = os.path.realpath("/run/current-system") if IS_NIXOS else ""
+    res = ui.run("Building and activating", cmd, log=log, verbose=args.verbose, cwd=REPO)
+    if not res.ok:
+        ui.line(ui.FAIL, "Build failed", ui.fmt_duration(res.seconds))
+        print()
+        ui.note(ui.nix_error_summary(res.lines), indent=4)
+        print(f"\n  {ui.paint('Full log:', 'bold')} {ui.pretty_path(log)}")
+        return res.code or 1
+
+    gen = generation()
+    label = f"generation {gen}" if gen else "new generation"
+    ui.line(ui.OK, f"Activated {label}", ui.fmt_duration(res.seconds))
+    warnings = ui.nix_warnings(res.lines)
+    if warnings:
+        ui.line(ui.WARN, f"{len(warnings)} warning{'s' if len(warnings) != 1 else ''}")
+        for w in warnings[:5]:
+            print(f"      {ui.paint(ui.fit(w, ui.width() - 8), 'yellow')}")
+    if IS_NIXOS:
+        show_changes(before)
+
+    if args.no_commit:
+        ui.line(ui.SKIP, "Commit skipped", "--no-commit")
+    elif not commit(args.message, gen, ran_checks):
+        return 1
+
+    print(
+        f"\n  {ui.paint('Done in ' + ui.fmt_duration(time.monotonic() - started), 'bold')}"
+        f"  {ui.paint('log: ' + ui.pretty_path(log), 'dim')}\n"
+    )
+    return 0
+
+
+if __name__ == "__main__":
+    try:
+        sys.exit(main())
+    except KeyboardInterrupt:
+        print("\n  Interrupted.")
+        sys.exit(130)

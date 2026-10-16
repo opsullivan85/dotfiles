@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+# Run a command with the flake's dev tools on PATH: directly if they're
+# already there (inside `nix develop`, or direnv), otherwise via `nix develop`.
+set -euo pipefail
+if command -v "$1" >/dev/null 2>&1; then
+  exec "$@"
+fi
+exec nix --extra-experimental-features "nix-command flakes" --option warn-dirty false develop "$(dirname "$0")/.." --command "$@"

@@ -1,5 +1,10 @@
 # NixOS graphical desktop: niri + Noctalia + the Stylix theme.
-{ pkgs, inputs, theme, ... }:
+{
+  pkgs,
+  inputs,
+  theme,
+  ...
+}:
 
 {
   imports = [

@@ -1,22 +1,100 @@
-#!/usr/bin/env bash
-# One-time (but safe to re-run) setup for things Nix deliberately doesn't
-# manage: toolchains and logins. (NvChad itself is linked by home-manager,
-# see home/core/nvim.nix.) Works on NixOS and on non-Nix machines
-# (each step is skipped if its tool isn't installed).
-set -euo pipefail
+#!/usr/bin/env python3
+"""One-time (but safe to re-run) setup for things Nix doesn't manage.
 
-step() { printf '\n==> %s\n' "$*"; }
+Toolchains, logins and git hooks. Each step is skipped when its tool isn't
+installed, so this works on NixOS and on non-Nix machines alike. (NvChad
+itself is linked by home-manager, see home/core/nvim.nix.)
+"""
 
-if command -v rustup >/dev/null; then
-  step "Rust toolchain"
-  rustup show active-toolchain >/dev/null 2>&1 || rustup default stable
-  rustup component add rust-analyzer
-fi
+from __future__ import annotations
 
-if command -v gh >/dev/null; then
-  step "GitHub login"
-  gh auth status >/dev/null 2>&1 && echo "Already logged in." || gh auth login
-fi
+import shutil
+import sys
+from collections.abc import Callable
+from pathlib import Path
 
-echo
-echo "Done."
+from dotlib import ui
+
+REPO = Path(__file__).resolve().parent
+LOG = ui.new_log("bootstrap")
+
+# Each step returns (symbol, detail). Raising isn't needed: failures are values.
+Outcome = tuple[str, str]
+
+
+def has(tool: str) -> bool:
+    return shutil.which(tool) is not None
+
+
+def location() -> Outcome:
+    expected = Path.home() / "dotfiles"
+    if REPO == expected.resolve():
+        return ui.OK, str(expected)
+    return (
+        ui.WARN,
+        f"repo is at {REPO}, but home/core/nvim.nix links nvim from ~/dotfiles",
+    )
+
+
+def git_hooks() -> Outcome:
+    res = ui.run(
+        "Installing git hooks",
+        [REPO / "scripts/in-devshell", "pre-commit", "install", "--install-hooks"],
+        log=LOG,
+        cwd=REPO,
+    )
+    return (ui.OK, "pre-commit + pre-push") if res.ok else (ui.FAIL, res.last_line)
+
+
+def rust() -> Outcome:
+    if not has("rustup"):
+        return ui.SKIP, "rustup not installed"
+    if not ui.capture(["rustup", "show", "active-toolchain"]):
+        res = ui.run("Installing stable Rust toolchain", ["rustup", "default", "stable"], log=LOG)
+        if not res.ok:
+            return ui.FAIL, res.last_line
+    res = ui.run("Adding rust-analyzer", ["rustup", "component", "add", "rust-analyzer"], log=LOG)
+    version = ui.capture(["rustc", "--version"])
+    return (ui.OK, version) if res.ok else (ui.FAIL, res.last_line)
+
+
+def github() -> Outcome:
+    if not has("gh"):
+        return ui.SKIP, "gh not installed"
+    if ui.run("Checking GitHub login", ["gh", "auth", "status"], log=LOG).ok:
+        return ui.OK, "already logged in"
+    print("  Logging in to GitHub (interactive):\n")
+    code = ui.run_interactive(["gh", "auth", "login"])
+    print()
+    return (ui.OK, "logged in") if code == 0 else (ui.FAIL, "gh auth login failed")
+
+
+STEPS: list[tuple[str, Callable[[], Outcome]]] = [
+    ("Repo location", location),
+    ("Git hooks", git_hooks),
+    ("Rust toolchain", rust),
+    ("GitHub login", github),
+]
+
+
+def main() -> int:
+    ui.header("bootstrap", "idempotent first-time setup")
+    failed = 0
+    for name, step in STEPS:
+        symbol, detail = step()
+        ui.line(symbol, name, detail)
+        failed += symbol == ui.FAIL
+    print()
+    if failed:
+        print(f"  {ui.paint(f'{failed} step(s) failed.', 'red')}  log: {ui.pretty_path(LOG)}\n")
+        return 1
+    print(f"  {ui.paint('All set.', 'bold', 'green')}\n")
+    return 0
+
+
+if __name__ == "__main__":
+    try:
+        sys.exit(main())
+    except KeyboardInterrupt:
+        print("\n  Interrupted.")
+        sys.exit(130)
