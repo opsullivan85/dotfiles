@@ -67,7 +67,7 @@
   };
 
   # System-level zsh registers it in /etc/shells; home-manager's programs.zsh
-  # (home/zsh.nix) handles the actual rc content/plugins.
+  # (home/core/zsh.nix) handles the actual rc content/plugins.
   programs.zsh.enable = true;
 
   users.users."owen" = {
@@ -85,7 +85,7 @@
 
   # Theme itself is defined once in theme.nix (see flake.nix for how it's
   # threaded through). Noctalia's stylix target is disabled in
-  # home/noctalia.nix instead — it's a home-manager-scoped target, not a
+  # home/os/nixos/noctalia.nix instead — it's a home-manager-scoped target, not a
   # NixOS one, so it has to be set there. There's no stylix target for
   # plain neovim (only "nixvim"/"nvf", for Nix-DSL configs) — irrelevant
   # here since NvChad owns ~/.config/nvim entirely outside Nix anyway.

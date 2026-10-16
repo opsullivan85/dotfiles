@@ -1,29 +1,15 @@
-{ config, pkgs, inputs, theme, ... }:
+# NixOS graphical desktop: niri + Noctalia + the Stylix theme.
+{ pkgs, inputs, theme, ... }:
 
 {
-  home.username = "owen";
-  home.homeDirectory = "/home/owen";
-  home.stateVersion = "26.05";
-
   imports = [
     inputs.stylix.homeModules.stylix
-    ./zsh.nix
-    ./tmux.nix
-    ./nvim.nix
     ./niri.nix
     ./noctalia.nix
-    ./dev
   ];
 
   home.packages = with pkgs; [
-    btop
-    claude-code
-    git
-    brave
-    pqiv
-    gh
-    keifu
-    tldr
+    wl-clipboard # Wayland clipboard (gh, nvim, anything that copies)
   ];
 
   # Stylix's home-manager module injects per-user nixpkgs overlays, which
@@ -37,12 +23,4 @@
   stylix.base16Scheme = theme.base16Scheme;
   stylix.polarity = theme.polarity;
   stylix.fonts.monospace = theme.monoFont;
-
-  programs.git = {
-    enable = true;
-    settings.user.name = "Owen Sullivan";
-    settings.user.email = "opsullivan85@gmail.com";
-  };
-
-  programs.home-manager.enable = true;
 }

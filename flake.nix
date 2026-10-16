@@ -18,31 +18,46 @@
     stylix.inputs.nixpkgs.follows = "nixpkgs";
   };
 
-  outputs = inputs@{ self, nixpkgs, home-manager, noctalia, stylix, ... }: {
-    nixosConfigurations.laptop = nixpkgs.lib.nixosSystem {
-      system = "x86_64-linux";
-      modules = [
-        ./hosts/laptop/configuration.nix
-        home-manager.nixosModules.home-manager
-        stylix.nixosModules.stylix
-        ({ pkgs, ... }:
-          let
-            theme = import ./theme.nix { inherit pkgs; };
-          in
-          {
-            # Computed once here, handed to both the NixOS modules (as a
-            # plain module arg) and home-manager modules (as a specialArg)
-            # so hosts/laptop/configuration.nix and home/noctalia.nix read
-            # the exact same values instead of each defining "gruvbox"
-            # themselves.
-            _module.args.theme = theme;
+  outputs = inputs@{ self, nixpkgs, home-manager, noctalia, stylix, ... }:
+    let
+      # Standalone home-manager hosts (non-NixOS) need their own pkgs.
+      pkgsFor = system: import nixpkgs {
+        inherit system;
+        config.allowUnfree = true;
+      };
+    in
+    {
+      nixosConfigurations.laptop = nixpkgs.lib.nixosSystem {
+        system = "x86_64-linux";
+        modules = [
+          ./hosts/laptop/configuration.nix
+          home-manager.nixosModules.home-manager
+          stylix.nixosModules.stylix
+          ({ pkgs, ... }:
+            let
+              theme = import ./theme.nix { inherit pkgs; };
+            in
+            {
+              # Computed once here, handed to both the NixOS modules (as a
+              # plain module arg) and home-manager modules (as a specialArg)
+              # so hosts/laptop/configuration.nix and home/os/nixos/noctalia.nix read
+              # the exact same values instead of each defining "gruvbox"
+              # themselves.
+              _module.args.theme = theme;
 
-            home-manager.useGlobalPkgs = true;
-            home-manager.useUserPackages = true;
-            home-manager.extraSpecialArgs = { inherit inputs theme; };
-            home-manager.users.owen = import ./home/home.nix;
-          })
-      ];
+              home-manager.useGlobalPkgs = true;
+              home-manager.useUserPackages = true;
+              home-manager.extraSpecialArgs = { inherit inputs theme; };
+              home-manager.users.owen = import ./home/machines/personal-laptop.nix;
+            })
+        ];
+      };
+
+      # Work laptop (Ubuntu, standalone home-manager).
+      homeConfigurations."owen@work-laptop" = home-manager.lib.homeManagerConfiguration {
+        pkgs = pkgsFor "x86_64-linux";
+        extraSpecialArgs = { inherit inputs; };
+        modules = [ ./home/machines/work-laptop.nix ];
+      };
     };
-  };
 }

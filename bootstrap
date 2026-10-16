@@ -1,0 +1,22 @@
+#!/usr/bin/env bash
+# One-time (but safe to re-run) setup for things Nix deliberately doesn't
+# manage: toolchains and logins. (NvChad itself is linked by home-manager,
+# see home/core/nvim.nix.) Works on NixOS and on non-Nix machines
+# (each step is skipped if its tool isn't installed).
+set -euo pipefail
+
+step() { printf '\n==> %s\n' "$*"; }
+
+if command -v rustup >/dev/null; then
+  step "Rust toolchain"
+  rustup show active-toolchain >/dev/null 2>&1 || rustup default stable
+  rustup component add rust-analyzer
+fi
+
+if command -v gh >/dev/null; then
+  step "GitHub login"
+  gh auth status >/dev/null 2>&1 && echo "Already logged in." || gh auth login
+fi
+
+echo
+echo "Done."
