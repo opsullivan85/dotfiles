@@ -21,6 +21,10 @@ layout {
     }
 }
 
+overview {
+    zoom 0.3
+}
+
 binds {
     // Essentials — a terminal and Noctalia's own app launcher (no separate
     // launcher binary needed; it's spawned at startup above).
