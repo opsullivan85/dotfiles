@@ -22,6 +22,13 @@
         source = "builtin";
         builtin = theme.noctaliaBuiltin;
       };
+
+      # Hidden until the pointer hits the top edge; reserve_space off so
+      # windows use that strip instead of leaving a gap.
+      bar.main = {
+        auto_hide = true;
+        reserve_space = false;
+      };
     };
   };
 }

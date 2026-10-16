@@ -26,7 +26,7 @@ binds {
     // launcher binary needed; it's spawned at startup above).
     Mod+Return { spawn "alacritty"; }
     Mod+Space   { spawn-sh "noctalia msg panel-toggle launcher"; }
-    Mod+Q       { close-window; }
+    Mod+BackSpace { close-window; }
     Mod+Shift+E { quit; }
     Mod+Shift+Slash { show-hotkey-overlay; }
 
