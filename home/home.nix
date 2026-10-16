@@ -19,6 +19,10 @@
     claude-code
     git
     brave
+    pqiv
+    gh
+    keifu
+    tldr
   ];
 
   # Stylix's home-manager module injects per-user nixpkgs overlays, which
