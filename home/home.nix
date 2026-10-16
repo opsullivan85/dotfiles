@@ -1,4 +1,4 @@
-{ config, pkgs, inputs, ... }:
+{ config, pkgs, inputs, theme, ... }:
 
 {
   home.username = "owen";
@@ -25,6 +25,13 @@
   # conflicts with home-manager.useGlobalPkgs (shared pkgs instance). The
   # NixOS-level stylix module already applies its overlays globally.
   stylix.overlays.enable = false;
+
+  # home-manager has its own stylix.enable (default false), separate from the
+  # NixOS one, so the targets here (tmux, alacritty, ...) stay inert without this.
+  stylix.enable = true;
+  stylix.base16Scheme = theme.base16Scheme;
+  stylix.polarity = theme.polarity;
+  stylix.fonts.monospace = theme.monoFont;
 
   programs.git = {
     enable = true;
