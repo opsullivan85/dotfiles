@@ -13,6 +13,6 @@ sudo nixos-rebuild switch --flake .#laptop "$@"
 if git diff --cached --quiet; then
   echo "No changes to commit."
 else
-  gen=$(readlink /nix/var/nix/profiles/system | sed 's/.*-//')
+  gen=$(readlink /nix/var/nix/profiles/system | sed -E 's/^system-([0-9]+)-link$/\1/')
   git commit -m "rebuild: generation ${gen}"
 fi
