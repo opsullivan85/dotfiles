@@ -6,6 +6,7 @@
   home.stateVersion = "26.05";
 
   imports = [
+    inputs.stylix.homeModules.stylix
     ./zsh.nix
     ./tmux.nix
     ./nvim.nix
@@ -19,6 +20,11 @@
     git
     brave
   ];
+
+  # Stylix's home-manager module injects per-user nixpkgs overlays, which
+  # conflicts with home-manager.useGlobalPkgs (shared pkgs instance). The
+  # NixOS-level stylix module already applies its overlays globally.
+  stylix.overlays.enable = false;
 
   programs.git = {
     enable = true;

@@ -1,9 +1,13 @@
-{ config, pkgs, inputs, ... }:
+{ config, pkgs, inputs, theme, ... }:
 
 {
   imports = [
     inputs.noctalia.homeModules.default
   ];
+
+  # Noctalia already ships its own native "Gruvbox" builtin (used below via
+  # theme.noctaliaBuiltin), so Stylix's rendering of it is redundant here.
+  stylix.targets.noctalia.enable = false;
 
   programs.noctalia = {
     enable = true;
@@ -16,7 +20,7 @@
       theme = {
         mode = "dark";
         source = "builtin";
-        builtin = "Catppuccin";
+        builtin = theme.noctaliaBuiltin;
       };
     };
   };
