@@ -1,0 +1,18 @@
+#!/usr/bin/env bash
+# Stage first (flakes only see git-tracked files, even uncommitted ones —
+# an untracked file is invisible to Nix), then build + activate, then commit
+# — but only if the switch actually succeeded, so broken configs never land
+# in history.
+set -euo pipefail
+cd "$(dirname "$0")"
+
+git add -A
+
+sudo nixos-rebuild switch --flake .#laptop "$@"
+
+if git diff --cached --quiet; then
+  echo "No changes to commit."
+else
+  gen=$(readlink /nix/var/nix/profiles/system | sed 's/.*-//')
+  git commit -m "rebuild: generation ${gen}"
+fi

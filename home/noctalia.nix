@@ -7,11 +7,12 @@
 
   programs.noctalia = {
     enable = true;
-    systemd.enable = true;
+    # Launched directly via niri's spawn-at-startup instead (see
+    # home/niri/config.kdl) rather than as a systemd user service — simpler,
+    # and avoids the two fighting over who starts it.
+    systemd.enable = false;
 
     settings = {
-      launch_apps_as_systemd_services = true;
-
       theme = {
         mode = "dark";
         source = "builtin";

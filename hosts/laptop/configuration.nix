@@ -39,6 +39,12 @@
     };
   };
 
+  # Lets greetd's PAM stack unlock (and, if missing, create) the login
+  # keyring using your login password, instead of leaving gnome-keyring
+  # running but locked and prompting separately.
+  services.gnome.gnome-keyring.enable = true;
+  security.pam.services.greetd.enableGnomeKeyring = true;
+
   services.printing.enable = true;
 
   # Noctalia (desktop shell on top of niri) wants these for its
@@ -56,13 +62,22 @@
     pulse.enable = true;
   };
 
+  # System-level zsh registers it in /etc/shells; home-manager's programs.zsh
+  # (home/zsh.nix) handles the actual rc content/plugins.
+  programs.zsh.enable = true;
+
   users.users."owen" = {
     isNormalUser = true;
     description = "Owen";
     extraGroups = [ "networkmanager" "wheel" ];
+    shell = pkgs.zsh;
   };
 
   nixpkgs.config.allowUnfree = true;
+
+  # NvChad's docs recommend this specific font (not the "Mono" variant —
+  # icons render smaller with that one) for its file/status icons.
+  fonts.packages = [ pkgs.nerd-fonts.jetbrains-mono ];
 
   # Prebuilt Noctalia binaries instead of compiling its C++/Qt core locally.
   nix.settings = {

@@ -4,6 +4,7 @@
   programs.tmux = {
     enable = true;
     terminal = "tmux-256color";
+    mouse = true;
 
     extraConfig = ''
       set -ga terminal-overrides ',*256col*:Tc'

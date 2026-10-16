@@ -7,10 +7,12 @@
     home-manager.url = "github:nix-community/home-manager";
     home-manager.inputs.nixpkgs.follows = "nixpkgs";
 
-    # Not following nixpkgs here on purpose: it keeps us eligible for
-    # noctalia's own Cachix binary cache (see nix.settings below) instead of
-    # compiling its Qt/C++ core from source.
-    noctalia.url = "github:noctalia-dev/noctalia";
+    # Not following nixpkgs here on purpose, AND pinned to the "cachix"
+    # branch rather than main: that's the only branch Noctalia's Cachix
+    # cache actually guarantees prebuilt binaries for. main's latest commit
+    # is not necessarily cached, which means compiling its Qt/C++ core
+    # locally (slow). See nix.settings below for the cache itself.
+    noctalia.url = "github:noctalia-dev/noctalia/cachix";
   };
 
   outputs = inputs@{ self, nixpkgs, home-manager, noctalia, ... }: {

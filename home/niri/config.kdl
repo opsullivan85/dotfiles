@@ -1,3 +1,5 @@
+spawn-at-startup "noctalia"
+
 input {
     keyboard {
         xkb {
@@ -20,10 +22,10 @@ layout {
 }
 
 binds {
-    // Essentials — a terminal and a launcher. Without these bound to
-    // something that's actually installed, nothing opens.
+    // Essentials — a terminal and Noctalia's own app launcher (no separate
+    // launcher binary needed; it's spawned at startup above).
     Mod+Return { spawn "alacritty"; }
-    Mod+D       { spawn "fuzzel"; }
+    Mod+Space   { spawn-sh "noctalia msg panel-toggle launcher"; }
     Mod+Q       { close-window; }
     Mod+Shift+E { quit; }
     Mod+Shift+Slash { show-hotkey-overlay; }
@@ -61,6 +63,21 @@ binds {
     Mod+3 { focus-workspace 3; }
     Mod+4 { focus-workspace 4; }
     Mod+5 { focus-workspace 5; }
+
+    // Cycle preset column widths
+    Mod+R       { switch-preset-column-width; }
+    Mod+Shift+R { switch-preset-column-width-back; }
+
+    // Consume/expel the focused window into/out of the column to the side
+    Mod+BracketLeft  { consume-or-expel-window-left; }
+    Mod+BracketRight { consume-or-expel-window-right; }
+
+    // Floating windows
+    Mod+V       { toggle-window-floating; }
+    Mod+Shift+V { switch-focus-between-floating-and-tiling; }
+
+    // Overview
+    Mod+O repeat=false { toggle-overview; }
 
     Print { screenshot; }
 }
