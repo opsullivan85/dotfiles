@@ -28,7 +28,17 @@
       bar.main = {
         auto_hide = true;
         reserve_space = false;
+        capsule = true;
       };
+
+      # dock = {
+      #   enabled = true;
+      #   auto_hide = true;
+      #   reserve_space = false;
+      # };
+
+      desktop_widgets.enabled = false;
+      lockscreen_widgets.enabled = false;
     };
   };
 }
