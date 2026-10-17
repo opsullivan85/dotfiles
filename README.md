@@ -14,9 +14,11 @@ hosts/laptop/        NixOS system config (things that need root: greetd, udev, p
 modules/             one file per tool, grouped by kind, opted into per machine:
   terminal/          zsh (+p10k), tmux
   cli/               git, gh, tldr, home-manager
-  tui/               btop, keifu, claude-code
+  tui/               btop, keifu, claude-code, chat
   gui/               brave, pqiv
   dev/               NvChad, plus one file per language (python, rust, godot…)
+tools/               our own CLI tools, one dir each (bash, Python, Rust…), built by Nix;
+                     `nix run .#<name>` to try one, install via a wrapper in modules/
 home/                home-manager glue that isn't a single tool:
   os/nixos/          graphical stuff that only exists on NixOS: niri, Noctalia, Stylix
   os/ubuntu/         non-NixOS glue (targets.genericLinux)

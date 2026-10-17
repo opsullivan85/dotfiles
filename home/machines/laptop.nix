@@ -14,6 +14,7 @@
     ../../modules/cli/tldr.nix
 
     ../../modules/tui/btop.nix
+    ../../modules/tui/chat.nix
     ../../modules/tui/claude-code.nix
     ../../modules/tui/keifu.nix
 

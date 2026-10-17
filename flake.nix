@@ -93,6 +93,15 @@
         ];
       };
 
+      # Custom CLI tools: one directory per tool in tools/<name>/, whose
+      # default.nix is a callPackage function using whatever builder suits the
+      # language (writeShellApplication, writers.writePython3Bin,
+      # rustPlatform.buildRustPackage, ...). Discovered automatically; run one
+      # with `nix run .#<name>`, install it via a modules/ wrapper.
+      packages.x86_64-linux = nixpkgs.lib.mapAttrs (name: _: pkgs.callPackage ./tools/${name} { }) (
+        nixpkgs.lib.filterAttrs (_: t: t == "directory") (builtins.readDir ./tools)
+      );
+
       nixosConfigurations.laptop = mkHost { name = "laptop"; };
 
       # Reusable pieces for other flakes (e.g. the private work repo, see
