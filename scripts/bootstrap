@@ -14,7 +14,7 @@ from pathlib import Path
 
 from dotlib import ui
 
-REPO = Path(__file__).resolve().parent
+REPO = Path(__file__).resolve().parent.parent
 LOG = ui.new_log("bootstrap")
 
 # Each step returns (symbol, detail). Raising isn't needed: failures are values.

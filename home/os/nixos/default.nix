@@ -3,5 +3,5 @@
 {
   imports = [ ./desktop.nix ];
 
-  programs.zsh.shellAliases.rebuild = "~/dotfiles/rebuild";
+  programs.zsh.shellAliases.rebuild = "~/dotfiles/scripts/rebuild";
 }

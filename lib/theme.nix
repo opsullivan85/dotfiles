@@ -9,7 +9,7 @@
   polarity = "dark";
   base16Scheme = "${pkgs.base16-schemes}/share/themes/gruvbox-dark-hard.yaml";
   noctaliaBuiltin = "Gruvbox";
-  nvchadTheme = "gruvbox"; # NvChad has its own theme names, set in modules/tui/nvim.nix
+  nvchadTheme = "gruvbox"; # NvChad has its own theme names, set in modules/tui/nvim/default.nix
 
   monoFont = {
     package = pkgs.nerd-fonts.jetbrains-mono;

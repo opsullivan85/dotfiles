@@ -55,7 +55,7 @@
             (
               { pkgs, ... }:
               let
-                theme = import ./theme.nix { inherit pkgs; };
+                theme = import ./lib/theme.nix { inherit pkgs; };
               in
               {
                 # Computed once here, handed to both the NixOS modules (as a
@@ -106,18 +106,36 @@
 
       # Reusable pieces for other flakes (e.g. the private work repo, see
       # docs/private-work.md). Machine files live in home/machines.
-      # Every modules/<category>/<name>.nix is exported as <category>-<name>
-      # (e.g. dev-rust), so a new module needs no edit here.
+      # Every modules/<category>/<name>.nix, and every modules/<category>/<name>/
+      # holding a default.nix, is exported as <category>-<name> (e.g. dev-rust,
+      # tui-nvim), so a new module needs no edit here.
       homeModules =
         let
           inherit (nixpkgs) lib;
           categories = lib.attrNames (lib.filterAttrs (_: t: t == "directory") (builtins.readDir ./modules));
           unitsIn =
             category:
-            map (file: {
-              name = "${category}-${lib.removeSuffix ".nix" file}";
-              value = ./modules/${category}/${file};
-            }) (lib.filter (lib.hasSuffix ".nix") (lib.attrNames (builtins.readDir ./modules/${category})));
+            lib.concatLists (
+              lib.mapAttrsToList (
+                entry: type:
+                if type == "directory" && builtins.pathExists ./modules/${category}/${entry}/default.nix then
+                  [
+                    {
+                      name = "${category}-${entry}";
+                      value = ./modules/${category}/${entry};
+                    }
+                  ]
+                else if type == "regular" && lib.hasSuffix ".nix" entry then
+                  [
+                    {
+                      name = "${category}-${lib.removeSuffix ".nix" entry}";
+                      value = ./modules/${category}/${entry};
+                    }
+                  ]
+                else
+                  [ ]
+              ) (builtins.readDir ./modules/${category})
+            );
         in
         {
           os-nixos = ./home/os/nixos;
@@ -138,7 +156,7 @@
           pkgs = pkgsFor system;
           extraSpecialArgs = {
             inherit inputs;
-            theme = import ./theme.nix { pkgs = pkgsFor system; };
+            theme = import ./lib/theme.nix { pkgs = pkgsFor system; };
           }
           // extraSpecialArgs;
           inherit modules;

@@ -19,7 +19,7 @@ from pathlib import Path
 
 from dotlib import ui
 
-REPO = Path(__file__).resolve().parent
+REPO = Path(__file__).resolve().parent.parent
 NIX = ["nix", "--extra-experimental-features", "nix-command flakes"]
 DEFAULT_NIXOS_HOST = "laptop"
 IS_NIXOS = Path("/etc/NIXOS").exists()

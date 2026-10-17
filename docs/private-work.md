@@ -5,7 +5,7 @@ repo** that consumes this one. This repo never references the private one.
 
 ## What this repo exports
 
-- `homeModules.<name>`: `os-nixos`, `os-ubuntu`, plus every file in `modules/` as
+- `homeModules.<name>`: `os-nixos`, `os-ubuntu`, plus every file or folder unit in `modules/` as
   `<category>-<name>` (`terminal-zsh`, `cli-git`, `tui-claude-code`, `dev-rust`, …), generated
   from the directory. The machine file in the private repo picks which it wants, same as
   `home/machines/laptop.nix`.
@@ -55,7 +55,7 @@ Note there is no always-on core: the private machine file lists everything it wa
        m.cli-gh
        m.tui-btop
        m.gui-brave
-       m.dev-nvim
+       m.tui-nvim
        m.dev-python
        m.dev-rust
        m.dev-cpp
@@ -87,7 +87,7 @@ Note there is no always-on core: the private machine file lists everything it wa
    ```
 
    Afterwards plain `home-manager switch --flake ~/dotfiles-work#owen@work-laptop` works.
-   Don't use this repo's `./rebuild` there; it is wired for the NixOS laptop.
+   Don't use this repo's `scripts/rebuild` there; it is wired for the NixOS laptop.
 
 ## Updating
 

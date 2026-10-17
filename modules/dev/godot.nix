@@ -24,7 +24,7 @@ let
   };
 in
 {
-  imports = [ ../tui/nvim-options.nix ];
+  imports = [ ../tui/nvim/options.nix ];
 
   home.packages = [
     pkgs.godot

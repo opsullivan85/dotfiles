@@ -1,7 +1,7 @@
 { pkgs, ... }:
 
 {
-  imports = [ ../tui/nvim-options.nix ];
+  imports = [ ../tui/nvim/options.nix ];
 
   # Toolchains are managed by rustup itself (rust-toolchain.toml, nightly on
   # demand), living in ~/.rustup outside Nix, same as on your Ubuntu machines.

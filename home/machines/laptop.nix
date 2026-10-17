@@ -17,7 +17,7 @@
     ../../modules/tui/chat.nix
     ../../modules/tui/claude-code.nix
     ../../modules/tui/keifu.nix
-    ../../modules/tui/nvim.nix
+    ../../modules/tui/nvim
 
     ../../modules/gui/brave.nix
     ../../modules/gui/pqiv.nix

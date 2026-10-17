@@ -1,7 +1,7 @@
 { pkgs, ... }:
 
 {
-  imports = [ ../tui/nvim-options.nix ];
+  imports = [ ../tui/nvim/options.nix ];
 
   home.packages = with pkgs; [
     tectonic # self-contained engine; fetches packages on demand
