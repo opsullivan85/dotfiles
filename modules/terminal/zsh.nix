@@ -3,7 +3,7 @@
 {
   home.file.".p10k.zsh".source = ./p10k.zsh;
 
-  # `z` and `zi` (interactive picker, needs fzf) jump to frecent directories.
+  # `z` and `zi` (interactive picker, needs fzf) jump to recent directories.
   programs.zoxide.enable = true;
   programs.fzf.enable = true;
 
@@ -12,6 +12,9 @@
     enableCompletion = true;
     autosuggestion.enable = true;
     syntaxHighlighting.enable = true;
+
+    shellAliases.open = "xdg-open";
+    shellAliases.l = "ls -F";
 
     plugins = [
       {
