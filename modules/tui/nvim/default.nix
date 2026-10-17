@@ -40,6 +40,9 @@ in
     ./options.nix
   ];
 
+  # Lives here, not in zsh.nix, so it only exists on machines that have nvim.
+  programs.zsh.shellAliases.vim = "nvim";
+
   # nix4nvchad pins the NvChad starter and copies it to ~/.config/nvim on each
   # activation (a writable copy, so edits there are overwritten by the next
   # switch — change modules/tui/nvim/ in this repo instead). Plugins are still fetched by
