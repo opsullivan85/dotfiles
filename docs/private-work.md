@@ -94,8 +94,3 @@ Note there is no always-on core: the private machine file lists everything it wa
 Pull in changes from this repo with `nix flake update dotfiles` in the private repo, then
 switch. To test unpublished changes, add
 `--override-input dotfiles path:$HOME/dotfiles` to the command.
-
-## If work content was ever committed here
-
-Deleting it in a later commit leaves it in history. Make the repo public only after scrubbing
-(`git filter-repo`) or from a fresh history.
