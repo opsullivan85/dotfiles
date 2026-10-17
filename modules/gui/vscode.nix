@@ -1,4 +1,9 @@
-{ pkgs, theme, ... }:
+{
+  lib,
+  pkgs,
+  theme,
+  ...
+}:
 
 {
   programs.vscode = {
@@ -16,6 +21,8 @@
     # Run the neovim extension in its own extension host so it starts first.
     profiles.default.userSettings = {
       "extensions.experimental.affinity"."asvetliakov.vscode-neovim" = 1;
+      # Hides the bundled Copilot and its chat UI; modules/tui/copilot.nix turns it back on.
+      "chat.disableAIFeatures" = lib.mkDefault true;
       "workbench.colorTheme" = theme.vscodeTheme;
       "editor.fontFamily" = "'${theme.monoFont.name}', monospace";
       "terminal.integrated.fontFamily" = "'${theme.monoFont.name}'";
