@@ -13,4 +13,11 @@ return {
     "nvim-treesitter/nvim-treesitter",
     opts = { ensure_installed = { "vim", "lua", "vimdoc" } },
   },
+
+  -- Animated cursor trail; works in the terminal.
+  {
+    "sphamba/smear-cursor.nvim",
+    event = "VeryLazy",
+    opts = {},
+  },
 }
