@@ -30,6 +30,9 @@
       "extensions.ignoreRecommendations" = true;
       "workbench.startupEditor" = "none";
       "workbench.enableExperiments" = false;
+      # Empty list hides the neovim extension's status bar entries (mode, pending keys, messages).
+      # it always looks ugly on my machines
+      "vscode-neovim.statusLineItems" = [ ];
       "workbench.colorTheme" = theme.vscodeTheme;
       "editor.fontFamily" = "'${theme.monoFont.name}', monospace";
       "terminal.integrated.fontFamily" = "'${theme.monoFont.name}'";
