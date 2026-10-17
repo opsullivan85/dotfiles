@@ -25,7 +25,7 @@ home/                home-manager glue that isn't a single tool:
   profiles/          personal.nix: identity (the work profile lives in the private repo)
   machines/          one file per machine, picking os + profile + the modules it wants
 nvim/                NvChad additions (plugins.lua, lazy-lock.json), applied via nix4nvchad
-switch, bootstrap    the two scripts you run (Python, stdlib only)
+rebuild, bootstrap   the two scripts you run (Python, stdlib only)
 scripts/             helpers (in-devshell)
 dotlib/              shared UI code for the scripts
 ```
@@ -37,14 +37,14 @@ Every module is also exported as `homeModules.<category>-<name>` (e.g. `dev-rust
 ## Daily use
 
 ```sh
-./switch                 # stage, check, rebuild, commit  (alias: rebuild)
-./switch "add tmux bar"  # same, with a commit message
-./switch -n              # rebuild without committing
-./switch -v              # stream the full Nix output
+./rebuild                 # stage, check, rebuild, commit  (the `rebuild` alias runs it from anywhere)
+./rebuild "add tmux bar"  # same, with a commit message
+./rebuild -n              # rebuild without committing
+./rebuild -v              # stream the full Nix output
 ```
 
-`switch` keeps the terminal quiet: a spinner while building, then a summary of
-what changed. Full output goes to `~/.local/state/dotfiles/logs/switch-latest.log`
+`rebuild` keeps the terminal quiet: a spinner while building, then a summary of
+what changed. Full output goes to `~/.local/state/dotfiles/logs/rebuild-latest.log`
 (outside the repo); on failure you get just the error and the log path.
 It commits only if the build succeeded, so history contains only configs that work.
 
@@ -66,7 +66,7 @@ don't need to enter the shell yourself. Hooks are installed by `./bootstrap`.
 | Check | Scope |
 | --- | --- |
 | nixfmt, statix, deadnix | `*.nix` (except the generated hardware config) |
-| ruff (check + format) | `switch`, `bootstrap`, `dotlib/` |
+| ruff (check + format) | `rebuild`, `bootstrap`, `dotlib/` |
 | stylua | `nvim/` |
 | shellcheck | shell scripts |
 | `nix flake check` | on `git push` only (slower) |

@@ -87,7 +87,7 @@ Note there is no always-on core: the private machine file lists everything it wa
    ```
 
    Afterwards plain `home-manager switch --flake ~/dotfiles-work#owen@work-laptop` works.
-   Don't use this repo's `./switch` there; it is wired for the NixOS laptop.
+   Don't use this repo's `./rebuild` there; it is wired for the NixOS laptop.
 
 ## Updating
 

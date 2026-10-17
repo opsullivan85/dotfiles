@@ -31,7 +31,7 @@ def git(*args: str) -> ui.Result:
 
 def parse() -> tuple[argparse.Namespace, list[str]]:
     p = argparse.ArgumentParser(
-        prog="switch",
+        prog="rebuild",
         description="Rebuild this machine from the flake and commit the result.",
         epilog="Unknown flags are passed through to nixos-rebuild / home-manager.",
     )
@@ -172,8 +172,13 @@ def main() -> int:
     args, extra = parse()
     os.chdir(REPO)
     cmd, where = build_command(args, extra)
-    ui.header("switch", f"{where}  ·  {socket.gethostname()}")
-    log = ui.new_log("switch")
+    # Authenticate first, while the prompt is visible and before the slow
+    # steps (staging, checks) can let the timestamp lapse or hide it.
+    if cmd[0] == "sudo" and ui.run_interactive(["sudo", "-v"]) != 0:
+        ui.line(ui.FAIL, "sudo authentication failed")
+        return 1
+    ui.header("rebuild", f"{where}  ·  {socket.gethostname()}")
+    log = ui.new_log("rebuild")
     started = time.monotonic()
 
     if not stage():
@@ -184,12 +189,6 @@ def main() -> int:
             ui.note(f"Full log: {ui.pretty_path(log)}")
             return 1
         ran_checks = True
-
-    # Prompt for the password up front, where the prompt is visible,
-    # rather than inside the spinner.
-    if cmd[0] == "sudo" and ui.run_interactive(["sudo", "-v"]) != 0:
-        ui.line(ui.FAIL, "sudo authentication failed")
-        return 1
 
     before = os.path.realpath("/run/current-system") if IS_NIXOS else ""
     res = ui.run("Building and activating", cmd, log=log, verbose=args.verbose, cwd=REPO)
