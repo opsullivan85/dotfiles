@@ -22,7 +22,6 @@ from dotlib import ui
 REPO = Path(__file__).resolve().parent
 NIX = ["nix", "--extra-experimental-features", "nix-command flakes"]
 DEFAULT_NIXOS_HOST = "laptop"
-DEFAULT_HM_TARGET = "owen@work-laptop"
 IS_NIXOS = Path("/etc/NIXOS").exists()
 
 
@@ -48,7 +47,7 @@ def parse() -> tuple[argparse.Namespace, list[str]]:
     p.add_argument(
         "-t",
         "--target",
-        help="flake output to build (default: laptop on NixOS, owen@work-laptop elsewhere)",
+        help="flake output to build (default on NixOS: laptop; required elsewhere)",
     )
     p.add_argument(
         "-v",
@@ -109,7 +108,10 @@ def build_command(args: argparse.Namespace, extra: list[str]) -> tuple[list[str]
             f".#{target}",
             *extra,
         ], f"NixOS · {target}"
-    target = args.target or DEFAULT_HM_TARGET
+    if not args.target:
+        ui.line(ui.FAIL, "No target", "this repo has no non-NixOS machine; pass --target")
+        sys.exit(1)
+    target = args.target
     return [
         "home-manager",
         "switch",

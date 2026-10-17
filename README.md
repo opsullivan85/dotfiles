@@ -2,28 +2,32 @@
 
 Flake-based configuration for my machines: a NixOS laptop running niri
 (PaperWM-style scrolling tiling) with the Noctalia shell, plus standalone
-home-manager on an Ubuntu work laptop. One theme, defined once, drives all of it.
+home-manager modules that a separate private repo reuses for the Ubuntu work laptop
+(see [docs/private-work.md](docs/private-work.md)). One theme, defined once, drives all of it.
 
 ## Layout
 
 ```
-flake.nix            outputs: nixosConfigurations, homeConfigurations, devShell, formatter
+flake.nix            outputs: nixosConfigurations, homeModules, lib.mkHome, devShell, formatter
 theme.nix            single source of truth: colour scheme, polarity, mono font
 hosts/laptop/        NixOS system config (things that need root: greetd, udev, pipewire…)
 home/                home-manager config, composed in layers:
-  core/              portable shell/dev environment: zsh, tmux, NvChad, dev/ toolchains
+  core/              portable basics every machine gets: zsh, tmux, NvChad, git
   os/nixos/          graphical stuff that only exists on NixOS: niri, Noctalia, Stylix
   os/ubuntu/         non-NixOS glue (targets.genericLinux)
-  profiles/          personal.nix, work.nix: identity and apps per hat
-  machines/          one file per machine, picking core + os + profile
+  profiles/          personal.nix: identity and apps (the work profile lives in the private repo)
+  dev/               one file per language/tool (python, rust, godot…), opted into per machine
+  shared/            graphical apps wanted on every machine (any hat)
+  machines/          one file per machine, picking core + os + profile + the dev/shared units it wants
 nvim/                NvChad additions (plugins.lua, lazy-lock.json), applied via nix4nvchad
 switch, bootstrap    the two scripts you run (Python, stdlib only)
 scripts/             helpers (in-devshell)
 dotlib/              shared UI code for the scripts
 ```
 
-A machine is `core + os/<x> + profiles/<y>`. For example
-`home/machines/personal-laptop.nix` is core + nixos + personal.
+A machine is `core + os/<x> + profiles/<y>` plus whichever `dev/*` and `shared/*`
+units its file imports. To drop a tool from one machine, delete its import line
+in `home/machines/`.
 
 ## Daily use
 
@@ -39,14 +43,14 @@ what changed. Full output goes to `~/.local/state/dotfiles/logs/switch-latest.lo
 (outside the repo); on failure you get just the error and the log path.
 It commits only if the build succeeded, so history contains only configs that work.
 
-On the Ubuntu laptop `switch` runs `home-manager switch --flake .#owen@work-laptop`.
+On a non-NixOS machine pass `--target <flake output>`; the work laptop is built from the private repo instead.
 
 ## New machine
 
 1. Install Nix with flakes enabled (NixOS has it; elsewhere use the Determinate or official installer).
 2. `git clone <repo> ~/dotfiles` (the `rebuild` alias and docs assume this path).
 3. NixOS: `sudo nixos-rebuild switch --flake ~/dotfiles#laptop`.
-   Ubuntu: `nix run home-manager -- switch --flake ~/dotfiles#owen@work-laptop`.
+   Ubuntu work laptop: see [docs/private-work.md](docs/private-work.md).
 4. `./bootstrap` for the parts Nix doesn't own: git hooks, Rust toolchain, `gh auth login`.
 
 ## Development

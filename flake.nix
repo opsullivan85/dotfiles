@@ -85,14 +85,37 @@
         ];
       };
 
-      # Work laptop (Ubuntu, standalone home-manager).
-      homeConfigurations."owen@work-laptop" = home-manager.lib.homeManagerConfiguration {
-        pkgs = pkgsFor "x86_64-linux";
-        extraSpecialArgs = {
-          inherit inputs;
-          theme = import ./theme.nix { pkgs = pkgsFor "x86_64-linux"; };
-        };
-        modules = [ ./home/machines/work-laptop.nix ];
+      # Reusable pieces for other flakes (e.g. the private work repo, see
+      # docs/private-work.md). Machine-specific files live in home/machines.
+      homeModules = {
+        core = ./home/core;
+        os-nixos = ./home/os/nixos;
+        os-ubuntu = ./home/os/ubuntu;
+        shared-apps = ./home/shared/apps.nix;
+        dev-cpp = ./home/dev/cpp.nix;
+        dev-godot = ./home/dev/godot.nix;
+        dev-latex = ./home/dev/latex.nix;
+        dev-python = ./home/dev/python.nix;
+        dev-rust = ./home/dev/rust.nix;
       };
+
+      # Standalone home-manager config with the args our modules expect
+      # (`inputs`, `theme`) already wired up. Downstream flakes call this
+      # instead of home-manager.lib.homeManagerConfiguration.
+      lib.mkHome =
+        {
+          modules,
+          system ? "x86_64-linux",
+          extraSpecialArgs ? { },
+        }:
+        home-manager.lib.homeManagerConfiguration {
+          pkgs = pkgsFor system;
+          extraSpecialArgs = {
+            inherit inputs;
+            theme = import ./theme.nix { pkgs = pkgsFor system; };
+          }
+          // extraSpecialArgs;
+          inherit modules;
+        };
     };
 }

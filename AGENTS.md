@@ -4,25 +4,26 @@ Guidance for AI coding agents working in this repo. See README.md for the human 
 
 ## What this is
 
-A flake driving a NixOS laptop (`nixosConfigurations.laptop`) and an Ubuntu work
-laptop (`homeConfigurations."owen@work-laptop"`, standalone home-manager). Keep it
-building for both.
+A flake driving a NixOS laptop (`nixosConfigurations.laptop`). The Ubuntu work laptop
+lives in a separate private repo that consumes this one via `homeModules` and
+`lib.mkHome` (see `docs/private-work.md`); keep those outputs working, and keep
+anything work-specific out of this repo.
 
 ## Principles (the owner's, repeatedly stated)
 
 - **Build up minimally and deliberately.** Don't add settings, packages or abstractions that weren't asked for.
 - **DRY theming.** Colours/fonts are defined once in `theme.nix`. Never hard-code a colour or font elsewhere.
-- **Self-contained units.** Each tool/language is one file (e.g. `home/core/dev/rust.nix`) so it can be removed or updated in one place.
-- **Layering.** A machine = `home/core` + `home/os/<nixos|ubuntu>` + `home/profiles/<personal|work>`, composed in `home/machines/`. Put things in the lowest layer where they're true: portable → core; needs NixOS/graphical → os/nixos; identity or hat-specific apps → profiles. Core must not depend on a graphical session or NixOS.
+- **Self-contained units.** Each tool/language is one file (e.g. `home/dev/rust.nix`) so it can be removed or updated in one place.
+- **Layering.** A machine = `home/core` + `home/os/<nixos|ubuntu>` + `home/profiles/<name>`, plus the optional units (`home/dev/*`, `home/shared/*`) its file in `home/machines/` imports explicitly. Core is only what every machine always gets (zsh, tmux, nvim, git) and must not depend on a graphical session or NixOS. Anything a machine might drop (a language, an app) is its own unit, listed per machine, never in core.
 - **The owner has strong preferences. Ask before choosing between real alternatives.**
-- **NvChad via nix4nvchad.** `home/core/nvim.nix` uses the `nix4nvchad` HM module: it pins the NvChad starter and copies it to `~/.config/nvim` on every switch, so edits there are overwritten; change this repo instead. Our additions are `nvim/plugins.lua` (extra lazy specs) and `nvim/lazy-lock.json`; the NvChad theme name is `nvchadTheme` in `theme.nix`. Plugins are still fetched by lazy.nvim on first launch. LSPs/formatters come from Nix on PATH (`home/core/dev/`), not Mason (Mason binaries don't run on NixOS).
+- **NvChad via nix4nvchad.** `home/core/nvim.nix` uses the `nix4nvchad` HM module: it pins the NvChad starter and copies it to `~/.config/nvim` on every switch, so edits there are overwritten; change this repo instead. Our additions are `nvim/plugins.lua` (extra lazy specs) and `nvim/lazy-lock.json`; the NvChad theme name is `nvchadTheme` in `theme.nix`. Plugins are still fetched by lazy.nvim on first launch. LSPs/formatters come from Nix on PATH (`home/dev/`), not Mason (Mason binaries don't run on NixOS).
 
 ## Workflow
 
 - Flakes only see **git-tracked** files. `git add` new files before building or evaluating, or Nix won't find them.
 - Rebuild with `./switch` (NixOS). It stages, runs pre-commit, builds, and commits `rebuild: generation N` on success. It needs `sudo`, so an agent usually can't run it; verify instead with:
   - `nix build .#nixosConfigurations.laptop.config.system.build.toplevel --no-link`
-  - `nix build '.#homeConfigurations."owen@work-laptop".activationPackage' --no-link`
+  - Work-laptop modules are checked by `nix flake check` (`homeModules`) and from the private repo.
   - `nix flake check`
 - Don't commit unless asked; `switch` makes the rebuild commits itself. When you do commit, end the message with the attribution trailer the harness gives you.
 - Logs from `switch`/`bootstrap` are in `~/.local/state/dotfiles/logs/` (`*-latest.log`).
@@ -41,4 +42,4 @@ Pre-commit (installed by `./bootstrap`) runs nixfmt, statix, deadnix, ruff, styl
 - `programs.neovim.enable` and `programs.nvchad.enable` are mutually exclusive (nix4nvchad asserts it).
 - Update `nvim/lazy-lock.json` by hand: run `:Lazy update` in nvim, then copy `~/.config/nvim/lazy-lock.json` into the repo.
 - Manual sync points: `nvchadTheme` vs `base16Scheme` in `theme.nix`; Noctalia GUI changes (`~/.local/state/noctalia/settings.toml`) back into `home/os/nixos/noctalia.nix`.
-- The work git identity in `home/profiles/work.nix` is a TODO; don't invent one.
+- Work identity and anything else work-specific belong in the private repo; don't add it here or invent values.

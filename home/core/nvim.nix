@@ -12,7 +12,7 @@
   # activation (a writable copy, so edits there are overwritten by the next
   # switch — change nvim/ in this repo instead). Plugins are still fetched by
   # lazy.nvim on first launch, pinned by nvim/lazy-lock.json. LSPs and
-  # formatters come from Nix on PATH (home/core/dev/), not Mason.
+  # formatters come from Nix on PATH (home/dev/), not Mason.
   programs.nvchad = {
     enable = true;
     backup = false; # otherwise every switch leaves an nvim_<date>.bak behind

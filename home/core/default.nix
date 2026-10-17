@@ -1,6 +1,7 @@
-# Portable core: everything that makes a shell/dev environment feel like
-# home on any machine, NixOS or not. Nothing here may depend on a graphical
-# session, on NixOS, or on which of your hats (personal/work) you're wearing.
+# Portable core: the shell/editor basics every machine gets (zsh, tmux, nvim,
+# git). Nothing here may depend on a graphical session, on NixOS, or on which
+# of your hats (personal/work) you're wearing. Anything a machine might want to
+# drop (languages, apps) belongs in ../dev or ../shared, imported per machine.
 { pkgs, ... }:
 
 {
@@ -8,7 +9,6 @@
     ./zsh.nix
     ./tmux.nix
     ./nvim.nix
-    ./dev
   ];
 
   home.packages = with pkgs; [

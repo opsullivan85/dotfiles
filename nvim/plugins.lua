@@ -1,6 +1,6 @@
 -- Extra lazy.nvim specs, merged into the NvChad starter's by nix4nvchad
 -- (programs.nvchad.extraPlugins in home/core/nvim.nix).
--- Binaries come from Nix (home/core/dev/*.nix), not Mason.
+-- Binaries come from Nix (home/dev/*.nix), not Mason.
 return {
   {
     "stevearc/conform.nvim",
