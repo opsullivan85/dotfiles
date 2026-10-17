@@ -89,13 +89,16 @@
 
   nixpkgs.config.allowUnfree = true;
 
-  # Nerd Font for icons (not the "Mono" variant — icons render smaller with it).
+  # NvChad's docs recommend this specific font (not the "Mono" variant —
+  # icons render smaller with that one) for its file/status icons.
   fonts.packages = [ theme.monoFont.package ];
 
   # Theme itself is defined once in theme.nix (see flake.nix for how it's
   # threaded through). Noctalia's stylix target is disabled in
   # home/os/nixos/noctalia.nix instead — it's a home-manager-scoped target, not a
-  # NixOS one, so it has to be set there.
+  # NixOS one, so it has to be set there. There's no stylix target for
+  # plain neovim (only "nixvim"/"nvf", for Nix-DSL configs) — irrelevant
+  # here since NvChad is themed separately (nvchadTheme in theme.nix).
   stylix.base16Scheme = theme.base16Scheme;
   stylix.polarity = theme.polarity;
   stylix.fonts.monospace = theme.monoFont;

@@ -1,11 +1,14 @@
 # NixOS graphical desktop: niri + Noctalia + the Stylix theme.
 {
   pkgs,
+  inputs,
+  theme,
   ...
 }:
 
 {
   imports = [
+    inputs.stylix.homeModules.stylix
     ./niri.nix
     ./noctalia.nix
   ];
@@ -14,7 +17,15 @@
     wl-clipboard # Wayland clipboard (gh, nvim, anything that copies)
   ];
 
-  # Core (home/core/stylix.nix) holds the theme and leaves autoEnable off;
-  # the desktop wants every target (tmux, alacritty, ...).
-  stylix.autoEnable = true;
+  # Stylix's home-manager module injects per-user nixpkgs overlays, which
+  # conflicts with home-manager.useGlobalPkgs (shared pkgs instance). The
+  # NixOS-level stylix module already applies its overlays globally.
+  stylix.overlays.enable = false;
+
+  # home-manager has its own stylix.enable (default false), separate from the
+  # NixOS one, so the targets here (tmux, alacritty, ...) stay inert without this.
+  stylix.enable = true;
+  stylix.base16Scheme = theme.base16Scheme;
+  stylix.polarity = theme.polarity;
+  stylix.fonts.monospace = theme.monoFont;
 }

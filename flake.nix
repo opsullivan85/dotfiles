@@ -14,6 +14,9 @@
     # locally (slow). See nix.settings below for the cache itself.
     noctalia.url = "github:noctalia-dev/noctalia/cachix";
 
+    nix4nvchad.url = "github:nix-community/nix4nvchad";
+    nix4nvchad.inputs.nixpkgs.follows = "nixpkgs";
+
     stylix.url = "github:nix-community/stylix";
     stylix.inputs.nixpkgs.follows = "nixpkgs";
   };

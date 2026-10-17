@@ -1,42 +1,28 @@
-{ pkgs, ... }:
+{
+  inputs,
+  pkgs,
+  theme,
+  ...
+}:
 
 {
-  # Neovim is configured entirely by Nix: plugins come from nixpkgs and the
-  # Lua in ../../nvim is copied into the store (read-only, rebuild to apply).
-  # Colours come from Stylix (home/core/stylix.nix), so there is no
-  # colourscheme set in the Lua. LSPs/formatters are on PATH from home/core/dev.
-  programs.neovim = {
-    enable = true;
-    initLua = builtins.readFile ../../nvim/init.lua;
-    plugins = with pkgs.vimPlugins; [
-      nvim-lspconfig
-      conform-nvim
-      blink-cmp
-      telescope-nvim
-      plenary-nvim
-      (nvim-treesitter.withPlugins (
-        p: with p; [
-          vim
-          lua
-          vimdoc
-          python
-          rust
-          cpp
-          c
-          cmake
-          toml
-          latex
-          gdscript
-          godot_resource
-        ]
-      ))
-    ];
-    extraPackages = with pkgs; [
-      ripgrep # telescope live grep
-      fd # telescope find files
-      lua-language-server
-    ];
-  };
+  imports = [ inputs.nix4nvchad.homeManagerModules.default ];
 
-  xdg.configFile."nvim/lua".source = ../../nvim/lua;
+  # nix4nvchad pins the NvChad starter and copies it to ~/.config/nvim on each
+  # activation (a writable copy, so edits there are overwritten by the next
+  # switch — change nvim/ in this repo instead). Plugins are still fetched by
+  # lazy.nvim on first launch, pinned by nvim/lazy-lock.json. LSPs and
+  # formatters come from Nix on PATH (home/core/dev/), not Mason.
+  programs.nvchad = {
+    enable = true;
+    backup = false; # otherwise every switch leaves an nvim_<date>.bak behind
+    extraPackages = [ pkgs.fd ]; # telescope file search
+    chadrcConfig = ''
+      local M = {}
+      M.base46 = { theme = "${theme.nvchadTheme}" }
+      return M
+    '';
+    extraPlugins = builtins.readFile ../../nvim/plugins.lua;
+    lazy-lock = builtins.readFile ../../nvim/lazy-lock.json;
+  };
 }

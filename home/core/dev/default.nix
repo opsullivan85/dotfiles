@@ -4,7 +4,7 @@
 #
 # LSP servers/formatters are provided here (on PATH) rather than installed by
 # Mason, since Mason's prebuilt binaries don't run on NixOS. Enabling them in
-# nvim is done in nvim/lua/lsp.lua and nvim/lua/format.lua.
+# nvim is done in nvim/plugins.lua.
 {
   imports = [
     ./python.nix

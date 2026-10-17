@@ -1,4 +1,4 @@
-{ config, pkgs, ... }:
+{ pkgs, ... }:
 
 let
   # External-editor hook: Godot -> nvim in an alacritty window, reusing one
@@ -7,7 +7,7 @@ let
   # "Use External Editor", Exec Path = godot-edit, Exec Flags = {file} {line} {col}
   godotEdit = pkgs.writeShellApplication {
     name = "godot-edit";
-    runtimeInputs = [ config.programs.neovim.finalPackage ];
+    runtimeInputs = [ pkgs.neovim ];
     text = ''
       sock="''${XDG_RUNTIME_DIR:-/tmp}/godot-nvim.sock"
       file=$1

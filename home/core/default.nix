@@ -5,7 +5,6 @@
 
 {
   imports = [
-    ./stylix.nix
     ./zsh.nix
     ./tmux.nix
     ./nvim.nix

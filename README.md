@@ -11,12 +11,12 @@ flake.nix            outputs: nixosConfigurations, homeConfigurations, devShell,
 theme.nix            single source of truth: colour scheme, polarity, mono font
 hosts/laptop/        NixOS system config (things that need root: greetd, udev, pipewire…)
 home/                home-manager config, composed in layers:
-  core/              portable shell/dev environment: zsh, tmux, neovim, Stylix, dev/ toolchains
+  core/              portable shell/dev environment: zsh, tmux, NvChad, dev/ toolchains
   os/nixos/          graphical stuff that only exists on NixOS: niri, Noctalia, Stylix
   os/ubuntu/         non-NixOS glue (targets.genericLinux)
   profiles/          personal.nix, work.nix: identity and apps per hat
   machines/          one file per machine, picking core + os + profile
-nvim/                Neovim Lua config, copied into the Nix store by home/core/nvim.nix
+nvim/                NvChad additions (plugins.lua, lazy-lock.json), applied via nix4nvchad
 switch, bootstrap    the two scripts you run (Python, stdlib only)
 scripts/             helpers (in-devshell)
 dotlib/              shared UI code for the scripts
@@ -66,5 +66,8 @@ don't need to enter the shell yourself. Hooks are installed by `./bootstrap`.
 
 ## Manual sync points
 
+Things that need keeping in sync by hand:
+
+- **NvChad theme**: `nvchadTheme` in `theme.nix` must match `base16Scheme` (NvChad doesn't read base16).
 - **Noctalia GUI changes** are written to `~/.local/state/noctalia/settings.toml`;
   copy anything you want to keep into `home/os/nixos/noctalia.nix`.
