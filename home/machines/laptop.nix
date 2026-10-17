@@ -20,6 +20,11 @@
 
     ../../modules/gui/brave.nix
     ../../modules/gui/pqiv.nix
+    ../../modules/gui/discord.nix
+    ../../modules/gui/freecad.nix
+    ../../modules/gui/pinta.nix
+    ../../modules/gui/spotify.nix
+    ../../modules/gui/libreoffice.nix
 
     ../../modules/dev/nvim.nix
     ../../modules/dev/python.nix

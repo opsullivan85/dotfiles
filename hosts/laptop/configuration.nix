@@ -89,6 +89,9 @@
 
   nixpkgs.config.allowUnfree = true;
 
+  # Steam needs system-level pieces (32-bit graphics, udev, firewall).
+  programs.steam.enable = true;
+
   # NvChad's docs recommend this specific font (not the "Mono" variant —
   # icons render smaller with that one) for its file/status icons.
   fonts.packages = [ theme.monoFont.package ];
