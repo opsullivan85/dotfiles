@@ -23,6 +23,13 @@
       "extensions.experimental.affinity"."asvetliakov.vscode-neovim" = 1;
       # Hides the bundled Copilot and its chat UI; modules/tui/copilot.nix turns it back on.
       "chat.disableAIFeatures" = lib.mkDefault true;
+      # Nix owns updates and extensions, so nothing should check for or suggest either.
+      "update.mode" = "none";
+      "extensions.autoCheckUpdates" = false;
+      "extensions.autoUpdate" = false;
+      "extensions.ignoreRecommendations" = true;
+      "workbench.startupEditor" = "none";
+      "workbench.enableExperiments" = false;
       "workbench.colorTheme" = theme.vscodeTheme;
       "editor.fontFamily" = "'${theme.monoFont.name}', monospace";
       "terminal.integrated.fontFamily" = "'${theme.monoFont.name}'";
