@@ -29,9 +29,10 @@
         builtin = theme.noctaliaBuiltin;
       };
 
-      # Hidden until the pointer hits the top edge; reserve_space off so
+      # Hidden until the pointer hits the bottom edge; reserve_space off so
       # windows use that strip instead of leaving a gap.
       bar.main = {
+        position = "bottom";
         auto_hide = true;
         reserve_space = false;
         capsule = true;
@@ -41,11 +42,7 @@
       shell.time_format = "{:%I:%M %p}";
       widget.clock.format = "{:%I:%M %p}";
 
-      # dock = {
-      #   enabled = true;
-      #   auto_hide = true;
-      #   reserve_space = false;
-      # };
+      dock.enabled = false;
 
       desktop_widgets.enabled = false;
       lockscreen_widgets.enabled = false;

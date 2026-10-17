@@ -28,6 +28,13 @@ overview {
     zoom 0.3
 }
 
+// Niri's top-left hot corner toggles the overview; Mod+O does that already.
+gestures {
+    hot-corners {
+        off
+    }
+}
+
 binds {
     // Essentials — a terminal and Noctalia's own app launcher (no separate
     // launcher binary needed; it's spawned at startup above).
