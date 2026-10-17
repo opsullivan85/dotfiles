@@ -15,7 +15,7 @@ building for both.
 - **Self-contained units.** Each tool/language is one file (e.g. `home/core/dev/rust.nix`) so it can be removed or updated in one place.
 - **Layering.** A machine = `home/core` + `home/os/<nixos|ubuntu>` + `home/profiles/<personal|work>`, composed in `home/machines/`. Put things in the lowest layer where they're true: portable → core; needs NixOS/graphical → os/nixos; identity or hat-specific apps → profiles. Core must not depend on a graphical session or NixOS.
 - **The owner has strong preferences. Ask before choosing between real alternatives.**
-- **NvChad stays outside Nix.** `nvim/` is symlinked with `mkOutOfStoreSymlink` (writable, assumes the repo is at `~/dotfiles`). LSPs/formatters come from Nix on PATH, not Mason (Mason binaries don't run on NixOS).
+- **Neovim is fully Nix-managed.** Plugins come from nixpkgs `vimPlugins` via `programs.neovim` (`home/core/nvim.nix`); the Lua in `nvim/` is copied into the store, so it is read-only and edits need a rebuild. No lazy.nvim/Mason. LSPs/formatters come from Nix on PATH (`home/core/dev/`) and are enabled in `nvim/lua/lsp.lua` / `format.lua`. Its colours come from Stylix, so don't set a colourscheme in the Lua.
 
 ## Workflow
 
@@ -37,6 +37,6 @@ Pre-commit (installed by `./bootstrap`) runs nixfmt, statix, deadnix, ruff, styl
 - Scripts (`switch`, `bootstrap`, `dotlib/`) are Python 3.11+, **stdlib only** (they must run on a fresh machine). Shared UI lives in `dotlib/ui.py`.
 - Stylix has separate NixOS and home-manager switches. HM-side needs `stylix.enable = true` and `stylix.overlays.enable = false` (because of `useGlobalPkgs`).
 - tmux: `%` in status strings is strftime-expanded, so write `%%`.
-- NvChad's `init.lua` `dofile`s files under `~/.local/share/nvim/base46/`; don't delete that directory. Regenerate with `require('base46').compile()`.
-- Manual sync points: `nvim/lua/chadrc.lua` theme vs `theme.nix`; Noctalia GUI changes (`~/.local/state/noctalia/settings.toml`) back into `home/os/nixos/noctalia.nix`.
+- Stylix lives in `home/core/stylix.nix` with `autoEnable` off (so Ubuntu stays headless-safe); `home/os/nixos/desktop.nix` turns it on. New nvim plugins go in `home/core/nvim.nix`, their setup in a new `nvim/lua/<name>.lua` required from `nvim/init.lua`.
+- Manual sync point: Noctalia GUI changes (`~/.local/state/noctalia/settings.toml`) back into `home/os/nixos/noctalia.nix`.
 - The work git identity in `home/profiles/work.nix` is a TODO; don't invent one.

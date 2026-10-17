@@ -2,8 +2,7 @@
 """One-time (but safe to re-run) setup for things Nix doesn't manage.
 
 Toolchains, logins and git hooks. Each step is skipped when its tool isn't
-installed, so this works on NixOS and on non-Nix machines alike. (NvChad
-itself is linked by home-manager, see home/core/nvim.nix.)
+installed, so this works on NixOS and on non-Nix machines alike.
 """
 
 from __future__ import annotations
@@ -24,16 +23,6 @@ Outcome = tuple[str, str]
 
 def has(tool: str) -> bool:
     return shutil.which(tool) is not None
-
-
-def location() -> Outcome:
-    expected = Path.home() / "dotfiles"
-    if REPO == expected.resolve():
-        return ui.OK, str(expected)
-    return (
-        ui.WARN,
-        f"repo is at {REPO}, but home/core/nvim.nix links nvim from ~/dotfiles",
-    )
 
 
 def git_hooks() -> Outcome:
@@ -70,7 +59,6 @@ def github() -> Outcome:
 
 
 STEPS: list[tuple[str, Callable[[], Outcome]]] = [
-    ("Repo location", location),
     ("Git hooks", git_hooks),
     ("Rust toolchain", rust),
     ("GitHub login", github),

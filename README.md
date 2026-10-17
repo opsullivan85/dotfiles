@@ -11,12 +11,12 @@ flake.nix            outputs: nixosConfigurations, homeConfigurations, devShell,
 theme.nix            single source of truth: colour scheme, polarity, mono font
 hosts/laptop/        NixOS system config (things that need root: greetd, udev, pipewire…)
 home/                home-manager config, composed in layers:
-  core/              portable shell/dev environment: zsh, tmux, nvim link, dev/ toolchains
+  core/              portable shell/dev environment: zsh, tmux, neovim, Stylix, dev/ toolchains
   os/nixos/          graphical stuff that only exists on NixOS: niri, Noctalia, Stylix
   os/ubuntu/         non-NixOS glue (targets.genericLinux)
   profiles/          personal.nix, work.nix: identity and apps per hat
   machines/          one file per machine, picking core + os + profile
-nvim/                NvChad config, symlinked to ~/.config/nvim (not managed by Nix)
+nvim/                Neovim Lua config, copied into the Nix store by home/core/nvim.nix
 switch, bootstrap    the two scripts you run (Python, stdlib only)
 scripts/             helpers (in-devshell)
 dotlib/              shared UI code for the scripts
@@ -44,7 +44,7 @@ On the Ubuntu laptop `switch` runs `home-manager switch --flake .#owen@work-lapt
 ## New machine
 
 1. Install Nix with flakes enabled (NixOS has it; elsewhere use the Determinate or official installer).
-2. `git clone <repo> ~/dotfiles` — it must live at `~/dotfiles` (the nvim symlink assumes it).
+2. `git clone <repo> ~/dotfiles` (the `rebuild` alias and docs assume this path).
 3. NixOS: `sudo nixos-rebuild switch --flake ~/dotfiles#laptop`.
    Ubuntu: `nix run home-manager -- switch --flake ~/dotfiles#owen@work-laptop`.
 4. `./bootstrap` for the parts Nix doesn't own: git hooks, Rust toolchain, `gh auth login`.
@@ -66,8 +66,5 @@ don't need to enter the shell yourself. Hooks are installed by `./bootstrap`.
 
 ## Manual sync points
 
-Two things deliberately live outside Nix and need copying by hand:
-
-- **NvChad theme**: `nvim/lua/chadrc.lua` must match `theme.nix`.
 - **Noctalia GUI changes** are written to `~/.local/state/noctalia/settings.toml`;
   copy anything you want to keep into `home/os/nixos/noctalia.nix`.

@@ -3,8 +3,8 @@
 # references them.
 #
 # LSP servers/formatters are provided here (on PATH) rather than installed by
-# NvChad's Mason, since Mason's prebuilt binaries don't run on NixOS. Enabling
-# them in nvim is NvChad-side config (outside Nix).
+# Mason, since Mason's prebuilt binaries don't run on NixOS. Enabling them in
+# nvim is done in nvim/lua/lsp.lua and nvim/lua/format.lua.
 {
   imports = [
     ./python.nix

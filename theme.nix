@@ -1,9 +1,7 @@
 # Single source of truth for the color scheme + its matching font, used by
 # both the NixOS module (stylix) and home-manager modules (noctalia).
 #
-# NvChad's own colorscheme (nvim/lua/chadrc.lua in this repo) is not driven
-# from here — NvChad owns that file and rewrites it itself — so it's a manual
-# sync point if this ever changes. Update both when it does.
+# Neovim is themed from here too, via Stylix (home/core/stylix.nix).
 { pkgs }:
 
 {

@@ -1,19 +1,42 @@
-{ config, pkgs, ... }:
+{ pkgs, ... }:
 
 {
-  # NvChad's config lives in this repo (../nvim) and is linked into place as
-  # a plain symlink to the checkout, NOT copied into the Nix store. That keeps
-  # it writable: NvChad rewrites lazy-lock.json and chadrc.lua itself. Nix
-  # doesn't manage its contents, only the link and the runtime deps below.
-  # Assumes the repo is checked out at ~/dotfiles.
-  xdg.configFile."nvim".source =
-    config.lib.file.mkOutOfStoreSymlink "${config.home.homeDirectory}/dotfiles/nvim";
+  # Neovim is configured entirely by Nix: plugins come from nixpkgs and the
+  # Lua in ../../nvim is copied into the store (read-only, rebuild to apply).
+  # Colours come from Stylix (home/core/stylix.nix), so there is no
+  # colourscheme set in the Lua. LSPs/formatters are on PATH from home/core/dev.
+  programs.neovim = {
+    enable = true;
+    initLua = builtins.readFile ../../nvim/init.lua;
+    plugins = with pkgs.vimPlugins; [
+      nvim-lspconfig
+      conform-nvim
+      blink-cmp
+      telescope-nvim
+      plenary-nvim
+      (nvim-treesitter.withPlugins (
+        p: with p; [
+          vim
+          lua
+          vimdoc
+          python
+          rust
+          cpp
+          c
+          cmake
+          toml
+          latex
+          gdscript
+          godot_resource
+        ]
+      ))
+    ];
+    extraPackages = with pkgs; [
+      ripgrep # telescope live grep
+      fd # telescope find files
+      lua-language-server
+    ];
+  };
 
-  home.packages = with pkgs; [
-    neovim
-    ripgrep
-    fd
-    nodejs
-    lua-language-server
-  ];
+  xdg.configFile."nvim/lua".source = ../../nvim/lua;
 }

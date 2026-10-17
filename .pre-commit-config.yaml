@@ -65,7 +65,6 @@ repos:
     rev: v5.0.0
     hooks:
       - id: end-of-file-fixer
-        exclude: ^nvim/lazy-lock\.json$
       - id: trailing-whitespace
         exclude: \.zsh$
       - id: check-merge-conflict

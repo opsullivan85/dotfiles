@@ -85,7 +85,10 @@
       # Work laptop (Ubuntu, standalone home-manager).
       homeConfigurations."owen@work-laptop" = home-manager.lib.homeManagerConfiguration {
         pkgs = pkgsFor "x86_64-linux";
-        extraSpecialArgs = { inherit inputs; };
+        extraSpecialArgs = {
+          inherit inputs;
+          theme = import ./theme.nix { pkgs = pkgsFor "x86_64-linux"; };
+        };
         modules = [ ./home/machines/work-laptop.nix ];
       };
     };
