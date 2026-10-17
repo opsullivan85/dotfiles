@@ -13,18 +13,19 @@ anything work-specific out of this repo.
 
 - **Build up minimally and deliberately.** Don't add settings, packages or abstractions that weren't asked for.
 - **DRY theming.** Colours/fonts are defined once in `theme.nix`. Never hard-code a colour or font elsewhere.
-- **Self-contained units.** Each tool/language is one file (e.g. `home/dev/rust.nix`) so it can be removed or updated in one place.
-- **Layering.** A machine = `home/core` + `home/os/<nixos|ubuntu>` + `home/profiles/<name>`, plus the optional units (`home/dev/*`, `home/shared/*`) its file in `home/machines/` imports explicitly. Core is only what every machine always gets (zsh, tmux, nvim, git) and must not depend on a graphical session or NixOS. Anything a machine might drop (a language, an app) is its own unit, listed per machine, never in core.
+- **Self-contained units.** Each tool/language is one file (e.g. `modules/dev/rust.nix`) so it can be removed or updated in one place.
+- **Hosts.** `mkHost { name; }` in `flake.nix` pairs `hosts/<name>/` with `home/machines/<name>.nix`; a new NixOS machine is those two plus one `nixosConfigurations.<name>` line.
+- **Layering.** A machine = `home/os/<nixos|ubuntu>` + `home/profiles/<name>`, plus the units from `modules/<category>/<name>.nix` (terminal, cli, tui, gui, dev; one level deep) that its file in `home/machines/` imports explicitly. There is no always-on core: if a machine might drop it, it's a module, listed per machine. Modules must not depend on a graphical session or NixOS unless they're in `gui/`. A new category directory is created when its first module is.
 - **The owner has strong preferences. Ask before choosing between real alternatives.**
-- **NvChad via nix4nvchad.** `home/core/nvim.nix` uses the `nix4nvchad` HM module: it pins the NvChad starter and copies it to `~/.config/nvim` on every switch, so edits there are overwritten; change this repo instead. Our additions are `nvim/plugins.lua` (extra lazy specs) and `nvim/lazy-lock.json`; the NvChad theme name is `nvchadTheme` in `theme.nix`. Plugins are still fetched by lazy.nvim on first launch. LSPs/formatters come from Nix on PATH (`home/dev/`), not Mason (Mason binaries don't run on NixOS).
+- **NvChad via nix4nvchad.** `modules/dev/nvim.nix` uses the `nix4nvchad` HM module: it pins the NvChad starter and copies it to `~/.config/nvim` on every switch, so edits there are overwritten; change this repo instead. Our additions are `nvim/plugins.lua` (extra lazy specs) and `nvim/lazy-lock.json`; the NvChad theme name is `nvchadTheme` in `theme.nix`. Plugins are still fetched by lazy.nvim on first launch. LSPs/formatters come from Nix on PATH (`modules/dev/`), not Mason (Mason binaries don't run on NixOS).
 
 ## Workflow
 
 - Flakes only see **git-tracked** files. `git add` new files before building or evaluating, or Nix won't find them.
 - Rebuild with `./switch` (NixOS). It stages, runs pre-commit, builds, and commits `rebuild: generation N` on success. It needs `sudo`, so an agent usually can't run it; verify instead with:
   - `nix build .#nixosConfigurations.laptop.config.system.build.toplevel --no-link`
-  - Work-laptop modules are checked by `nix flake check` (`homeModules`) and from the private repo.
   - `nix flake check`
+  - Work-laptop modules are checked by `nix flake check` (`homeModules`) and from the private repo.
 - Don't commit unless asked; `switch` makes the rebuild commits itself. When you do commit, end the message with the attribution trailer the harness gives you.
 - Logs from `switch`/`bootstrap` are in `~/.local/state/dotfiles/logs/` (`*-latest.log`).
 

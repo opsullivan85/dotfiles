@@ -37,6 +37,10 @@
         capsule = true;
       };
 
+      # Noctalia defaults to 24h and ignores the system locale.
+      shell.time_format = "{:%I:%M %p}";
+      widget.clock.format = "{:%I:%M %p}";
+
       # dock = {
       #   enabled = true;
       #   auto_hide = true;

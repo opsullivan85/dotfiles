@@ -37,6 +37,42 @@
           config.allowUnfree = true;
         };
       pkgs = pkgsFor "x86_64-linux";
+
+      # One NixOS host per hosts/<name>/ (system config) paired with
+      # home/machines/<name>.nix (home-manager config for `user`).
+      mkHost =
+        {
+          name,
+          user ? "owen",
+          system ? "x86_64-linux",
+        }:
+        nixpkgs.lib.nixosSystem {
+          inherit system;
+          modules = [
+            ./hosts/${name}/configuration.nix
+            home-manager.nixosModules.home-manager
+            stylix.nixosModules.stylix
+            (
+              { pkgs, ... }:
+              let
+                theme = import ./theme.nix { inherit pkgs; };
+              in
+              {
+                # Computed once here, handed to both the NixOS modules (as a
+                # plain module arg) and home-manager modules (as a specialArg)
+                # so hosts/<name>/configuration.nix and home/os/nixos/noctalia.nix read
+                # the exact same values instead of each defining "gruvbox"
+                # themselves.
+                _module.args.theme = theme;
+
+                home-manager.useGlobalPkgs = true;
+                home-manager.useUserPackages = true;
+                home-manager.extraSpecialArgs = { inherit inputs theme; };
+                home-manager.users.${user} = import ./home/machines/${name}.nix;
+              }
+            )
+          ];
+        };
     in
     {
       # `nix fmt` formats every .nix file in the repo.
@@ -57,47 +93,28 @@
         ];
       };
 
-      nixosConfigurations.laptop = nixpkgs.lib.nixosSystem {
-        system = "x86_64-linux";
-        modules = [
-          ./hosts/laptop/configuration.nix
-          home-manager.nixosModules.home-manager
-          stylix.nixosModules.stylix
-          (
-            { pkgs, ... }:
-            let
-              theme = import ./theme.nix { inherit pkgs; };
-            in
-            {
-              # Computed once here, handed to both the NixOS modules (as a
-              # plain module arg) and home-manager modules (as a specialArg)
-              # so hosts/laptop/configuration.nix and home/os/nixos/noctalia.nix read
-              # the exact same values instead of each defining "gruvbox"
-              # themselves.
-              _module.args.theme = theme;
-
-              home-manager.useGlobalPkgs = true;
-              home-manager.useUserPackages = true;
-              home-manager.extraSpecialArgs = { inherit inputs theme; };
-              home-manager.users.owen = import ./home/machines/personal-laptop.nix;
-            }
-          )
-        ];
-      };
+      nixosConfigurations.laptop = mkHost { name = "laptop"; };
 
       # Reusable pieces for other flakes (e.g. the private work repo, see
-      # docs/private-work.md). Machine-specific files live in home/machines.
-      homeModules = {
-        core = ./home/core;
-        os-nixos = ./home/os/nixos;
-        os-ubuntu = ./home/os/ubuntu;
-        shared-apps = ./home/shared/apps.nix;
-        dev-cpp = ./home/dev/cpp.nix;
-        dev-godot = ./home/dev/godot.nix;
-        dev-latex = ./home/dev/latex.nix;
-        dev-python = ./home/dev/python.nix;
-        dev-rust = ./home/dev/rust.nix;
-      };
+      # docs/private-work.md). Machine files live in home/machines.
+      # Every modules/<category>/<name>.nix is exported as <category>-<name>
+      # (e.g. dev-rust), so a new module needs no edit here.
+      homeModules =
+        let
+          inherit (nixpkgs) lib;
+          categories = lib.attrNames (lib.filterAttrs (_: t: t == "directory") (builtins.readDir ./modules));
+          unitsIn =
+            category:
+            map (file: {
+              name = "${category}-${lib.removeSuffix ".nix" file}";
+              value = ./modules/${category}/${file};
+            }) (lib.filter (lib.hasSuffix ".nix") (lib.attrNames (builtins.readDir ./modules/${category})));
+        in
+        {
+          os-nixos = ./home/os/nixos;
+          os-ubuntu = ./home/os/ubuntu;
+        }
+        // lib.listToAttrs (lib.concatMap unitsIn categories);
 
       # Standalone home-manager config with the args our modules expect
       # (`inputs`, `theme`) already wired up. Downstream flakes call this

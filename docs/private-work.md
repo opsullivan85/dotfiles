@@ -5,16 +5,16 @@ repo** that consumes this one. This repo never references the private one.
 
 ## What this repo exports
 
-- `homeModules.<name>`: `core`, `os-nixos`, `os-ubuntu`, `shared-apps`, `dev-cpp`,
-  `dev-godot`, `dev-latex`, `dev-python`, `dev-rust`. These mirror `home/`; the machine
-  file in the private repo picks which it wants, same as `home/machines/personal-laptop.nix`.
+- `homeModules.<name>`: `os-nixos`, `os-ubuntu`, plus every file in `modules/` as
+  `<category>-<name>` (`terminal-zsh`, `cli-git`, `tui-claude-code`, `dev-rust`, …), generated
+  from the directory. The machine file in the private repo picks which it wants, same as
+  `home/machines/laptop.nix`.
 - `lib.mkHome { modules; system ? "x86_64-linux"; extraSpecialArgs ? { }; }`: wraps
   `home-manager.lib.homeManagerConfiguration` and passes the `inputs` and `theme`
   args our modules expect (`inputs` there is this repo's, not the private repo's). Always use it instead of calling home-manager directly.
 
-Structure changes to know about: there is no `home/core/dev/` any more (languages are
-`home/dev/*`, opt-in per machine), graphical apps are in `home/shared/apps.nix`, and
-core contains no personal or work identity.
+Note there is no always-on core: the private machine file lists everything it wants, including
+`cli-git` and `cli-home-manager` (needed for the `home-manager` command).
 
 ## Set up the private repo
 
@@ -47,9 +47,15 @@ core contains no personal or work identity.
    in
    {
      imports = [
-       m.core
        m.os-ubuntu
-       m.shared-apps
+       m.terminal-zsh
+       m.terminal-tmux
+       m.cli-git
+       m.cli-home-manager
+       m.cli-gh
+       m.tui-btop
+       m.gui-brave
+       m.dev-nvim
        m.dev-python
        m.dev-rust
        m.dev-cpp

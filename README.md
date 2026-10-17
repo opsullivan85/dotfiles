@@ -11,23 +11,26 @@ home-manager modules that a separate private repo reuses for the Ubuntu work lap
 flake.nix            outputs: nixosConfigurations, homeModules, lib.mkHome, devShell, formatter
 theme.nix            single source of truth: colour scheme, polarity, mono font
 hosts/laptop/        NixOS system config (things that need root: greetd, udev, pipewire…)
-home/                home-manager config, composed in layers:
-  core/              portable basics every machine gets: zsh, tmux, NvChad, git
+modules/             one file per tool, grouped by kind, opted into per machine:
+  terminal/          zsh (+p10k), tmux
+  cli/               git, gh, tldr, home-manager
+  tui/               btop, keifu, claude-code
+  gui/               brave, pqiv
+  dev/               NvChad, plus one file per language (python, rust, godot…)
+home/                home-manager glue that isn't a single tool:
   os/nixos/          graphical stuff that only exists on NixOS: niri, Noctalia, Stylix
   os/ubuntu/         non-NixOS glue (targets.genericLinux)
-  profiles/          personal.nix: identity and apps (the work profile lives in the private repo)
-  dev/               one file per language/tool (python, rust, godot…), opted into per machine
-  shared/            graphical apps wanted on every machine (any hat)
-  machines/          one file per machine, picking core + os + profile + the dev/shared units it wants
+  profiles/          personal.nix: identity (the work profile lives in the private repo)
+  machines/          one file per machine, picking os + profile + the modules it wants
 nvim/                NvChad additions (plugins.lua, lazy-lock.json), applied via nix4nvchad
 switch, bootstrap    the two scripts you run (Python, stdlib only)
 scripts/             helpers (in-devshell)
 dotlib/              shared UI code for the scripts
 ```
 
-A machine is `core + os/<x> + profiles/<y>` plus whichever `dev/*` and `shared/*`
-units its file imports. To drop a tool from one machine, delete its import line
-in `home/machines/`.
+A machine is `os/<x> + profiles/<y>` plus whichever `modules/*` its file imports.
+To drop a tool from one machine, delete its import line in `home/machines/`.
+Every module is also exported as `homeModules.<category>-<name>` (e.g. `dev-rust`).
 
 ## Daily use
 
