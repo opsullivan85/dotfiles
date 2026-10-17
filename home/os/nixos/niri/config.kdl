@@ -5,6 +5,9 @@ input {
         xkb {
             layout "us"
         }
+        // Niri's defaults (600 ms / 25 Hz) make held keys like j feel steppy.
+        repeat-delay 250
+        repeat-rate 50
     }
 
     touchpad {

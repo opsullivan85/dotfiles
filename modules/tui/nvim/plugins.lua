@@ -20,4 +20,11 @@ return {
     event = "VeryLazy",
     opts = {},
   },
+
+  -- Animated scrolling (<C-d>, <C-u>, zz, ...).
+  {
+    "karb94/neoscroll.nvim",
+    event = "VeryLazy",
+    opts = {},
+  },
 }
