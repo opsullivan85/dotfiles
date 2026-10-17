@@ -12,6 +12,12 @@
   nvchadTheme = "gruvbox"; # NvChad has its own theme names, set in modules/tui/nvim/default.nix
   vscodeTheme = "Dark Modern"; # Stylix's generated VS Code theme has poor contrast, so it's off
 
+  cursor = {
+    package = pkgs.bibata-cursors;
+    name = "Bibata-Modern-Classic";
+    size = 24;
+  };
+
   monoFont = {
     package = pkgs.nerd-fonts.jetbrains-mono;
     name = "JetBrainsMono Nerd Font";

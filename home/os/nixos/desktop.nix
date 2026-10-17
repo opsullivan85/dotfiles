@@ -28,6 +28,7 @@
   stylix.base16Scheme = theme.base16Scheme;
   stylix.polarity = theme.polarity;
   stylix.fonts.monospace = theme.monoFont;
+  stylix.cursor = theme.cursor;
 
   # stylix is ugly here, handle seperately
   stylix.targets.vscode.enable = false;

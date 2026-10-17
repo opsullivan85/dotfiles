@@ -105,6 +105,7 @@
   stylix.base16Scheme = theme.base16Scheme;
   stylix.polarity = theme.polarity;
   stylix.fonts.monospace = theme.monoFont;
+  stylix.cursor = theme.cursor;
 
   # Prebuilt Noctalia binaries instead of compiling its C++/Qt core locally.
   nix.settings = {
