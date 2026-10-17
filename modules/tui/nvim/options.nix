@@ -20,5 +20,10 @@
       default = [ ];
       description = "Treesitter parsers to install.";
     };
+    plugins = lib.mkOption {
+      type = lib.types.listOf lib.types.lines;
+      default = [ ];
+      description = "Extra lazy.nvim specs (lua tables, each ending in a comma).";
+    };
   };
 }

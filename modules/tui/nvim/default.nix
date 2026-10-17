@@ -31,6 +31,7 @@ let
         opts.ensure_installed = vim.list_extend(opts.ensure_installed or {}, ${toLua cfg.treesitter})
       end,
     },
+    ${lib.concatStringsSep "\n" cfg.plugins}
   '';
 in
 {
