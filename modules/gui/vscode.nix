@@ -1,4 +1,4 @@
-{ pkgs, ... }:
+{ pkgs, theme, ... }:
 
 {
   programs.vscode = {
@@ -10,7 +10,12 @@
     # "niri" here and unrecognised, so say explicitly to use the Secret Service.
     argvSettings.password-store = "gnome-libsecret";
     # Run the neovim extension in its own extension host so it starts first.
-    profiles.default.userSettings."extensions.experimental.affinity"."asvetliakov.vscode-neovim" = 1;
+    profiles.default.userSettings = {
+      "extensions.experimental.affinity"."asvetliakov.vscode-neovim" = 1;
+      "workbench.colorTheme" = theme.vscodeTheme;
+      "editor.fontFamily" = "'${theme.monoFont.name}', monospace";
+      "terminal.integrated.fontFamily" = "'${theme.monoFont.name}'";
+    };
     profiles.default.extensions = with pkgs.vscode-extensions; [
       asvetliakov.vscode-neovim
       yzhang.markdown-all-in-one
