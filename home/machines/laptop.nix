@@ -8,6 +8,7 @@
     ../../modules/terminal/zsh.nix
     ../../modules/terminal/tmux.nix
 
+    ../../modules/cli/copy.nix
     ../../modules/cli/git.nix
     ../../modules/cli/gh.nix
     ../../modules/cli/home-manager.nix
