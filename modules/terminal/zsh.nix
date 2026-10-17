@@ -27,6 +27,10 @@
       # Tab completion ignores case and treats - and _ as interchangeable
       zstyle ':completion:*' matcher-list 'm:{a-zA-Z-_}={A-Za-z_-}'
 
+      # Ctrl+Left/Right jump over words
+      bindkey '^[[1;5D' backward-word
+      bindkey '^[[1;5C' forward-word
+
       # Each terminal gets its own independent tmux session (not a shared
       # one — that's what caused typing to mirror across every window).
       if [[ -z "$TMUX" && -o interactive ]]; then

@@ -124,6 +124,8 @@
   # broken. Everything else (btop, claude-code, git, zsh, tmux, nvim deps)
   # lives in home/.
   environment.systemPackages = with pkgs; [
+    # niri starts this on demand when on PATH, giving X11 apps (Steam) a DISPLAY.
+    xwayland-satellite
     vim
     wget
     brightnessctl

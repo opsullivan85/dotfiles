@@ -24,8 +24,22 @@ let
   };
 in
 {
+  imports = [ ../tui/nvim-options.nix ];
+
   home.packages = [
     pkgs.godot
     godotEdit
   ];
+
+  dev.nvim = {
+    # gdscript talks to the running Godot editor (language server on port 6005).
+    lspServers = [ "gdscript" ];
+    treesitter = [
+      "gdscript"
+      "godot_resource"
+    ];
+  };
+
+  # No-op on machines without modules/gui/vscode.nix.
+  programs.vscode.profiles.default.extensions = [ pkgs.vscode-extensions.geequlim.godot-tools ];
 }

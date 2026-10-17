@@ -17,6 +17,7 @@
     ../../modules/tui/chat.nix
     ../../modules/tui/claude-code.nix
     ../../modules/tui/keifu.nix
+    ../../modules/tui/nvim.nix
 
     ../../modules/gui/brave.nix
     ../../modules/gui/pqiv.nix
@@ -25,8 +26,8 @@
     ../../modules/gui/pinta.nix
     ../../modules/gui/spotify.nix
     ../../modules/gui/libreoffice.nix
+    ../../modules/gui/vscode.nix
 
-    ../../modules/dev/nvim.nix
     ../../modules/dev/python.nix
     ../../modules/dev/rust.nix
     ../../modules/dev/cpp.nix

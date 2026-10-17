@@ -18,7 +18,7 @@ anything work-specific out of this repo.
 - **Hosts.** `mkHost { name; }` in `flake.nix` pairs `hosts/<name>/` with `home/machines/<name>.nix`; a new NixOS machine is those two plus one `nixosConfigurations.<name>` line.
 - **Layering.** A machine = `home/os/<nixos|ubuntu>` + `home/profiles/<name>`, plus the units from `modules/<category>/<name>.nix` (terminal, cli, tui, gui, dev; one level deep) that its file in `home/machines/` imports explicitly. There is no always-on core: if a machine might drop it, it's a module, listed per machine. Modules must not depend on a graphical session or NixOS unless they're in `gui/`. A new category directory is created when its first module is.
 - **The owner has strong preferences. Ask before choosing between real alternatives.**
-- **NvChad via nix4nvchad.** `modules/dev/nvim.nix` uses the `nix4nvchad` HM module: it pins the NvChad starter and copies it to `~/.config/nvim` on every switch, so edits there are overwritten; change this repo instead. Our additions are `nvim/plugins.lua` (extra lazy specs) and `nvim/lazy-lock.json`; the NvChad theme name is `nvchadTheme` in `theme.nix`. Plugins are still fetched by lazy.nvim on first launch. LSPs/formatters come from Nix on PATH (`modules/dev/`), not Mason (Mason binaries don't run on NixOS).
+- **NvChad via nix4nvchad.** `modules/tui/nvim.nix` uses the `nix4nvchad` HM module: it pins the NvChad starter and copies it to `~/.config/nvim` on every switch, so edits there are overwritten; change this repo instead. Our additions are `nvim/plugins.lua` (extra lazy specs) and `nvim/lazy-lock.json`; the NvChad theme name is `nvchadTheme` in `theme.nix`. Plugins are still fetched by lazy.nvim on first launch. LSPs/formatters come from Nix on PATH (`modules/dev/`), not Mason (Mason binaries don't run on NixOS).
 
 ## Workflow
 
@@ -31,6 +31,8 @@ anything work-specific out of this repo.
 - Logs from `rebuild`/`bootstrap` are in `~/.local/state/dotfiles/logs/` (`*-latest.log`).
 
 ## Checks
+
+Don't run `nixfmt`, `nix fmt` or other formatters/linters directly; the only way to format and lint is the pre-commit command below. Edit, verify with the build, then run it once at the end.
 
 Pre-commit (installed by `./bootstrap`) runs nixfmt, statix, deadnix, ruff, stylua, shellcheck, and `nix flake check` on push. Run all with `scripts/in-devshell pre-commit run --all-files`. Fix findings rather than suppressing them; the only configured exemptions are in `statix.toml` and `.pre-commit-config.yaml` (generated `hardware-configuration.nix`, `*.zsh`).
 
