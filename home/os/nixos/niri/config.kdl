@@ -1,5 +1,8 @@
 spawn-at-startup "noctalia"
 
+// Ask apps to drop their own title bars; niri draws none.
+prefer-no-csd
+
 input {
     keyboard {
         xkb {
