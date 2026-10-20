@@ -2,7 +2,6 @@
   config,
   pkgs,
   inputs,
-  theme,
   ...
 }:
 
@@ -10,10 +9,6 @@
   imports = [
     inputs.noctalia.homeModules.default
   ];
-
-  # Noctalia already ships its own native "Gruvbox" builtin (used below via
-  # theme.noctaliaBuiltin), so Stylix's rendering of it is redundant here.
-  stylix.targets.noctalia.enable = false;
 
   programs.noctalia = {
     enable = true;
@@ -23,11 +18,11 @@
     systemd.enable = false;
 
     settings = {
-      theme = {
-        mode = "dark";
-        source = "builtin";
-        builtin = theme.noctaliaBuiltin;
-      };
+      # theme.* comes from Stylix's noctalia target (custom palette from base16).
+
+      # Solid wallpaper in the scheme's background, matching niri's
+      # background-color so there's no flash at startup.
+      wallpaper.default.path = "color:#${config.lib.stylix.colors.base00}";
 
       # Hidden until the pointer hits the bottom edge; reserve_space off so
       # windows use that strip instead of leaving a gap.

@@ -8,7 +8,6 @@
 {
   polarity = "dark";
   base16Scheme = "${pkgs.base16-schemes}/share/themes/gruvbox-dark-hard.yaml";
-  noctaliaBuiltin = "Gruvbox";
   nvchadTheme = "gruvbox"; # NvChad has its own theme names, set in modules/tui/nvim/default.nix
   vscodeTheme = "Dark Modern"; # Stylix's generated VS Code theme has poor contrast, so it's off
 

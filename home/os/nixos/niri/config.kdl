@@ -19,6 +19,9 @@ input {
 layout {
     gaps 8
 
+    // Shown until Noctalia draws its wallpaper at startup.
+    background-color "@background@"
+
     focus-ring {
         width 2
     }

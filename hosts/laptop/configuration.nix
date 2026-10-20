@@ -46,14 +46,6 @@
     };
   };
 
-  # Don't offer a login until home-manager has activated: otherwise niri can
-  # start before ~/.config/niri/config.kdl exists and fall back to its default
-  # config (no Noctalia).
-  systemd.services.greetd = {
-    after = [ "home-manager-owen.service" ];
-    wants = [ "home-manager-owen.service" ];
-  };
-
   # Lets greetd's PAM stack unlock (and, if missing, create) the login
   # keyring using your login password, instead of leaving gnome-keyring
   # running but locked and prompting separately.

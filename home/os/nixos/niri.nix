@@ -67,5 +67,7 @@ in
     };
   };
 
-  home.file.".config/niri/config.kdl".source = ./niri/config.kdl;
+  home.file.".config/niri/config.kdl".source = pkgs.replaceVars ./niri/config.kdl {
+    background = "#${config.lib.stylix.colors.base00}";
+  };
 }
