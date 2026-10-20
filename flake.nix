@@ -29,15 +29,22 @@
       ...
     }:
     let
-      # Standalone home-manager hosts (non-NixOS) need their own pkgs.
+      systems = [
+        "x86_64-linux"
+        "aarch64-linux"
+      ];
+      forAllSystems = nixpkgs.lib.genAttrs systems;
+
+      # Standalone home-manager hosts (non-NixOS) need their own pkgs, and the
+      # per-system outputs below use it too. NixOS hosts ignore this: with
+      # useGlobalPkgs they share the system's pkgs, whose allowUnfree is set
+      # in hosts/<name>/configuration.nix.
       pkgsFor =
         system:
         import nixpkgs {
           inherit system;
           config.allowUnfree = true;
         };
-      pkgs = pkgsFor "x86_64-linux";
-
       # One NixOS host per hosts/<name>/ (system config) paired with
       # home/machines/<name>.nix (home-manager config for `user`).
       mkHost =
@@ -76,31 +83,42 @@
     in
     {
       # `nix fmt` formats every .nix file in the repo.
-      formatter.x86_64-linux = pkgs.nixfmt;
+      formatter = forAllSystems (system: (pkgsFor system).nixfmt);
 
       # Everything the pre-commit hooks need (see .pre-commit-config.yaml and
       # scripts/in-devshell). Enter with `nix develop`; hooks also re-enter
       # it on their own, so you never have to.
-      devShells.x86_64-linux.default = pkgs.mkShell {
-        packages = with pkgs; [
-          pre-commit
-          nixfmt
-          statix
-          deadnix
-          ruff
-          stylua
-          shellcheck
-        ];
-      };
+      devShells = forAllSystems (system: {
+        default = (pkgsFor system).mkShell {
+          packages = with pkgsFor system; [
+            pre-commit
+            nixfmt
+            statix
+            deadnix
+            ruff
+            stylua
+            shellcheck
+          ];
+        };
+      });
 
       # Custom CLI tools: one directory per tool in tools/<name>/, whose
       # default.nix is a callPackage function using whatever builder suits the
       # language (writeShellApplication, writers.writePython3Bin,
       # rustPlatform.buildRustPackage, ...). Discovered automatically; run one
       # with `nix run .#<name>`, install it via a modules/ wrapper.
-      packages.x86_64-linux = nixpkgs.lib.mapAttrs (name: _: pkgs.callPackage ./tools/${name} { }) (
-        nixpkgs.lib.filterAttrs (_: t: t == "directory") (builtins.readDir ./tools)
+      packages = forAllSystems (
+        system:
+        nixpkgs.lib.mapAttrs (name: _: (pkgsFor system).callPackage ./tools/${name} { }) (
+          nixpkgs.lib.filterAttrs (_: t: t == "directory") (builtins.readDir ./tools)
+        )
       );
+
+      # `nix flake check` builds these (and pre-push runs it), so a config or
+      # tool that evaluates but doesn't build is caught before pushing.
+      checks.x86_64-linux = inputs.self.packages.x86_64-linux // {
+        laptop = inputs.self.nixosConfigurations.laptop.config.system.build.toplevel;
+      };
 
       nixosConfigurations.laptop = mkHost { name = "laptop"; };
 

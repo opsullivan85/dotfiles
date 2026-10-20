@@ -12,9 +12,10 @@
   ];
 
   boot.loader.systemd-boot.enable = true;
+  boot.loader.systemd-boot.configurationLimit = 10; # /boot is only 1 GB
   boot.loader.efi.canTouchEfiVariables = true;
 
-  networking.hostName = "nixos";
+  networking.hostName = "laptop";
   networking.networkmanager.enable = true;
 
   time.timeZone = "America/New_York";
@@ -73,7 +74,7 @@
   };
 
   # System-level zsh registers it in /etc/shells; home-manager's programs.zsh
-  # (home/core/zsh.nix) handles the actual rc content/plugins.
+  # (modules/terminal/zsh.nix) handles the actual rc content/plugins.
   programs.zsh.enable = true;
 
   users.users."owen" = {

@@ -8,10 +8,16 @@
     ../../modules/terminal/zsh.nix
     ../../modules/terminal/tmux.nix
 
+    ../../modules/cli/bat.nix
     ../../modules/cli/copy.nix
+    ../../modules/cli/delta.nix
+    ../../modules/cli/eza.nix
     ../../modules/cli/git.nix
     ../../modules/cli/gh.nix
     ../../modules/cli/home-manager.nix
+    ../../modules/cli/jq.nix
+    ../../modules/cli/nom.nix
+    ../../modules/cli/ripgrep.nix
     ../../modules/cli/tldr.nix
 
     ../../modules/tui/btop.nix

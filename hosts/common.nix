@@ -3,4 +3,17 @@
   # Runs prebuilt generic-Linux binaries (e.g. zig-built test executables
   # from uvx toolchains) that expect /lib64/ld-linux-x86-64.so.2.
   programs.nix-ld.enable = true;
+
+  # Every rebuild adds a generation; without this the store only grows.
+  nix.gc = {
+    automatic = true;
+    dates = "weekly";
+    options = "--delete-older-than 14d";
+  };
+  nix.optimise.automatic = true; # weekly hardlink dedupe of the store
+
+  nix.settings = {
+    warn-dirty = false; # the tree is dirty on every rebuild
+    download-buffer-size = 268435456; # 256 MiB, avoids "download buffer is full"
+  };
 }

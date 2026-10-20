@@ -36,7 +36,8 @@
 
       # Each terminal gets its own independent tmux session (not a shared
       # one — that's what caused typing to mirror across every window).
-      if [[ -z "$TMUX" && -o interactive ]]; then
+      # Escape hatch if tmux is ever broken: NO_TMUX=1 zsh
+      if [[ -z "$TMUX" && -z "$NO_TMUX" && -o interactive ]] && command -v tmux >/dev/null; then
         exec tmux new-session
       fi
     '';

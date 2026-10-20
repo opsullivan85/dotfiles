@@ -47,11 +47,14 @@ in
   # activation (a writable copy, so edits there are overwritten by the next
   # switch — change modules/tui/nvim/ in this repo instead). Plugins are still fetched by
   # lazy.nvim on first launch, pinned by lazy-lock.json. LSPs and
-  # formatters come from Nix on PATH (home/dev/), not Mason.
+  # formatters come from Nix on PATH (modules/dev/), not Mason.
   programs.nvchad = {
     enable = true;
     backup = false; # otherwise every switch leaves an nvim_<date>.bak behind
-    extraPackages = [ pkgs.fd ]; # telescope file search
+    extraPackages = [
+      pkgs.fd
+      pkgs.ripgrep
+    ]; # telescope file search and live grep
     chadrcConfig = ''
       local M = {}
       M.base46 = { theme = "${theme.nvchadTheme}" }

@@ -12,7 +12,9 @@ from __future__ import annotations
 import argparse
 import os
 import re
+import shutil
 import socket
+import subprocess
 import sys
 import time
 from pathlib import Path
@@ -53,7 +55,7 @@ def parse() -> tuple[argparse.Namespace, list[str]]:
         "-v",
         "--verbose",
         action="store_true",
-        help="stream full Nix output instead of a spinner",
+        help="stream full Nix output instead of a spinner (through nom, if installed)",
     )
     return p.parse_known_args()
 
@@ -119,6 +121,26 @@ def build_command(args: argparse.Namespace, extra: list[str]) -> tuple[list[str]
         f".#{target}",
         *extra,
     ], f"home-manager · {target}"
+
+
+def build(cmd: list[str], log: Path, verbose: bool) -> ui.Result:
+    """Run the build; with -v and nom on PATH, show nom's live build tree.
+
+    nom needs the terminal, so its output isn't captured: the log only gets
+    the command, and a failure points at the scrollback instead of a summary.
+    """
+    nom = shutil.which("nom")
+    if not (verbose and nom and ui.TTY):
+        return ui.run("Building and activating", cmd, log=log, verbose=verbose, cwd=REPO)
+    start = time.monotonic()
+    with log.open("a") as f:
+        f.write(f"$ {' '.join(cmd)}  (via nom)\n")
+    code = subprocess.run(
+        ["bash", "-c", 'set -o pipefail; "$@" --log-format internal-json -v 2>&1 | nom --json', "_", *cmd],
+        check=False,
+        cwd=REPO,
+    ).returncode
+    return ui.Result(code, [], time.monotonic() - start)
 
 
 def generation() -> str:
@@ -191,7 +213,7 @@ def main() -> int:
         ran_checks = True
 
     before = os.path.realpath("/run/current-system") if IS_NIXOS else ""
-    res = ui.run("Building and activating", cmd, log=log, verbose=args.verbose, cwd=REPO)
+    res = build(cmd, log, args.verbose)
     if not res.ok:
         ui.line(ui.FAIL, "Build failed", ui.fmt_duration(res.seconds))
         print()
