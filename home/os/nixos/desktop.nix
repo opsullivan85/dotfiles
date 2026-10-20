@@ -30,6 +30,9 @@
   stylix.fonts.monospace = theme.monoFont;
   stylix.cursor = theme.cursor;
 
+  # Apps that still draw their own title bar show only a close button (right side).
+  dconf.settings."org/gnome/desktop/wm/preferences".button-layout = ":close";
+
   # stylix is ugly here, handle seperately
   stylix.targets.vscode.enable = false;
 }
