@@ -14,6 +14,15 @@ return {
     opts = { ensure_installed = { "vim", "lua", "vimdoc" } },
   },
 
+  -- Telescope pickers for LSP results, replacing nvim's quickfix-based defaults.
+  {
+    "nvim-telescope/telescope.nvim",
+    keys = {
+      { "grr", "<cmd>Telescope lsp_references<cr>", desc = "LSP references" },
+      { "grs", "<cmd>Telescope lsp_document_symbols<cr>", desc = "LSP document symbols" },
+    },
+  },
+
   -- Animated cursor trail; works in the terminal.
   {
     "sphamba/smear-cursor.nvim",
