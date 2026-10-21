@@ -19,7 +19,30 @@ return {
     "nvim-telescope/telescope.nvim",
     keys = {
       { "grr", "<cmd>Telescope lsp_references<cr>", desc = "LSP references" },
-      { "grs", "<cmd>Telescope lsp_document_symbols<cr>", desc = "LSP document symbols" },
+      {
+        "grs",
+        function()
+          -- Everything except variables/constants/etc., which are too noisy.
+          require("telescope.builtin").lsp_document_symbols {
+            symbols = {
+              "Module",
+              "Namespace",
+              "Package",
+              "Class",
+              "Method",
+              "Constructor",
+              "Enum",
+              "Interface",
+              "Function",
+              "Struct",
+              "Event",
+              "Operator",
+              "TypeParameter",
+            },
+          }
+        end,
+        desc = "LSP document symbols (no variables)",
+      },
     },
   },
 
