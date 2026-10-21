@@ -72,6 +72,20 @@ don't need to enter the shell yourself. Hooks are installed by `scripts/bootstra
 
 `nix fmt` formats all Nix files.
 
+## Switching themes
+
+`lib/theme.nix` ships a dark (default) and a light variant. Pick one without touching git:
+
+```
+scripts/rebuild --theme light     # or dark; `default` goes back to git's choice
+scripts/rebuild --theme nord      # any base16 scheme name, for experimenting
+```
+
+The choice is stored in `~/.local/state/dotfiles/theme.json` and applied with `--impure`, so
+it sticks for later rebuilds until you set `--theme default`. An arbitrary scheme keeps the
+NvChad/VS Code themes of the dark or light variant (picked by "light" in its name); edit the
+JSON to override `nvchadTheme`/`vscodeTheme`/`polarity`.
+
 ## Manual sync points
 
 Things that need keeping in sync by hand:

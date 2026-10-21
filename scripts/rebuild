@@ -10,6 +10,7 @@ under ~/.local/state/dotfiles/logs; the terminal gets a summary.
 from __future__ import annotations
 
 import argparse
+import json
 import os
 import re
 import shutil
@@ -25,6 +26,7 @@ REPO = Path(__file__).resolve().parent.parent
 NIX = ["nix", "--extra-experimental-features", "nix-command flakes"]
 DEFAULT_NIXOS_HOST = "laptop"
 IS_NIXOS = Path("/etc/NIXOS").exists()
+THEME_FILE = Path.home() / ".local/state/dotfiles/theme.json"
 
 
 def git(*args: str) -> ui.Result:
@@ -50,6 +52,12 @@ def parse() -> tuple[argparse.Namespace, list[str]]:
         "-t",
         "--target",
         help="flake output to build (default on NixOS: laptop; required elsewhere)",
+    )
+    p.add_argument(
+        "--theme",
+        metavar="NAME",
+        help="dark | light | default (back to git's) | any base16 scheme name; "
+        "remembered outside git and applied with --impure (see lib/theme.nix)",
     )
     p.add_argument(
         "-v",
@@ -98,27 +106,55 @@ def checks(log: Path, verbose: bool) -> bool:
     return False
 
 
+def set_theme(name: str) -> None:
+    """Record the --theme choice in THEME_FILE (outside git); 'default' clears it."""
+    if name == "default":
+        THEME_FILE.unlink(missing_ok=True)
+        return
+    theme = {"variant": "light" if "light" in name else "dark"}
+    if name not in ("dark", "light"):
+        theme["scheme"] = name
+    THEME_FILE.parent.mkdir(parents=True, exist_ok=True)
+    THEME_FILE.write_text(json.dumps(theme) + "\n")
+
+
+def theme_env() -> list[str]:
+    """Env assignment + --impure for the stored theme, or nothing for git's default."""
+    if not THEME_FILE.exists():
+        return []
+    return [f"DOTFILES_THEME={json.dumps(json.loads(THEME_FILE.read_text()))}"]
+
+
 def build_command(args: argparse.Namespace, extra: list[str]) -> tuple[list[str], str]:
+    # `env` (not os.environ) so the variable survives sudo's environment reset.
+    env = theme_env()
+    impure = ["--impure"] if env else []
     if IS_NIXOS:
         target = args.target or DEFAULT_NIXOS_HOST
         verb = "boot" if args.boot else "switch"
         return [
             "sudo",
+            "env",
+            *env,
             "nixos-rebuild",
             verb,
             "--flake",
             f".#{target}",
+            *impure,
             *extra,
-        ], f"NixOS · {target}"
+        ], f"NixOS · {target}" + (f" · theme {THEME_FILE.read_text().strip()}" if env else "")
     if not args.target:
         ui.line(ui.FAIL, "No target", "this repo has no non-NixOS machine; pass --target")
         sys.exit(1)
     target = args.target
     return [
+        "env",
+        *env,
         "home-manager",
         "switch",
         "--flake",
         f".#{target}",
+        *impure,
         *extra,
     ], f"home-manager · {target}"
 
@@ -193,6 +229,8 @@ def commit(message: str | None, gen: str, ran_checks: bool) -> bool:
 def main() -> int:
     args, extra = parse()
     os.chdir(REPO)
+    if args.theme:
+        set_theme(args.theme)
     cmd, where = build_command(args, extra)
     # Authenticate first, while the prompt is visible and before the slow
     # steps (staging, checks) can let the timestamp lapse or hide it.
