@@ -8,8 +8,13 @@
 # can also pick one, or any base16 scheme by name, without touching git: it
 # stores the choice in ~/.local/state/dotfiles/theme.json and hands it to this
 # file as JSON in $DOTFILES_THEME, which only works with `--impure` (which
-# `rebuild` adds). Keys: variant ("dark"|"light"), plus optional overrides of
-# scheme (a name in pkgs.base16-schemes), polarity, nvchadTheme, vscodeTheme.
+# `rebuild` adds). Keys: variant ("dark"|"light"), scheme (a name in
+# pkgs.base16-schemes), and optional nvchadTheme / vscodeTheme / polarity.
+#
+# For a scheme that isn't one of the variants, whatever isn't given is guessed:
+# light vs dark from "light" in its name, the NvChad theme as the scheme name
+# (hyphens to underscores; wrong guesses show up as an error in nvim), VS Code
+# as plain Dark/Light Modern.
 { pkgs }:
 
 let
@@ -30,7 +35,12 @@ let
 
   raw = builtins.getEnv "DOTFILES_THEME"; # "" unless evaluating with --impure
   override = if raw == "" then { } else builtins.fromJSON raw;
-  chosen = variants.${override.variant or "dark"} // removeAttrs override [ "variant" ];
+  guessedVariant = if pkgs.lib.hasInfix "light" (override.scheme or "") then "light" else "dark";
+  guessed = pkgs.lib.optionalAttrs (override ? scheme) {
+    nvchadTheme = builtins.replaceStrings [ "-" ] [ "_" ] override.scheme;
+  };
+  chosen =
+    variants.${override.variant or guessedVariant} // guessed // removeAttrs override [ "variant" ];
 in
 {
   inherit (chosen) polarity nvchadTheme vscodeTheme;

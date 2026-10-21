@@ -82,9 +82,13 @@ scripts/rebuild --theme nord      # any base16 scheme name, for experimenting
 ```
 
 The choice is stored in `~/.local/state/dotfiles/theme.json` and applied with `--impure`, so
-it sticks for later rebuilds until you set `--theme default`. An arbitrary scheme keeps the
-NvChad/VS Code themes of the dark or light variant (picked by "light" in its name); edit the
-JSON to override `nvchadTheme`/`vscodeTheme`/`polarity`.
+it sticks for later rebuilds until you set `--theme default`. For a scheme other than the two
+variants, what you don't specify is guessed: light/dark from "light" in the name, the NvChad
+theme as the scheme name (`-` becomes `_`), VS Code as Dark/Light Modern. Specify the rest:
+
+```
+scripts/rebuild --theme catppuccin-mocha --nvchad catppuccin --vscode "Catppuccin Mocha"
+```
 
 ## Manual sync points
 
