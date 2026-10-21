@@ -12,6 +12,18 @@ return {
   {
     "nvim-treesitter/nvim-treesitter",
     opts = { ensure_installed = { "vim", "lua", "vimdoc" } },
+    -- The lockfile pins nvim-treesitter's `main` branch, which ignores
+    -- `ensure_installed` and doesn't start highlighting itself (NvChad's config
+    -- targets the old `master`), so install the parsers and start it here.
+    -- Without parsers, treesitter features such as flash's `S` do nothing.
+    config = function(_, opts)
+      require("nvim-treesitter").install(opts.ensure_installed or {})
+      vim.api.nvim_create_autocmd("FileType", {
+        callback = function(args)
+          pcall(vim.treesitter.start, args.buf)
+        end,
+      })
+    end,
   },
 
   -- Telescope pickers for LSP results, replacing nvim's quickfix-based defaults.
