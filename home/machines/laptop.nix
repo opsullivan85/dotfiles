@@ -6,6 +6,7 @@
     ../profiles/personal.nix
 
     ../../modules/terminal/zsh.nix
+    ../../modules/terminal/p10k
     ../../modules/terminal/tmux.nix
 
     ../../modules/cli/bat.nix

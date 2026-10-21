@@ -49,6 +49,7 @@ Note there is no always-on core: the private machine file lists everything it wa
      imports = [
        m.os-ubuntu
        m.terminal-zsh
+       m.terminal-p10k
        m.terminal-tmux
        m.cli-git
        m.cli-home-manager

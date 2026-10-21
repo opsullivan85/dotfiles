@@ -12,7 +12,7 @@ flake.nix            outputs: nixosConfigurations, homeModules, lib.mkHome, devS
 lib/theme.nix        single source of truth: colour scheme, polarity, mono font
 hosts/laptop/        NixOS system config (things that need root: greetd, udev, pipewire…)
 modules/             one file per tool, grouped by kind, opted into per machine:
-  terminal/          zsh (+p10k), tmux
+  terminal/          zsh, p10k, tmux
   cli/               git, gh, tldr, home-manager
   tui/               btop, keifu, claude-code, chat, nvim/ (a unit that needs several
                      files is a folder with a default.nix)
