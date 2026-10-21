@@ -60,6 +60,7 @@ in
       M.base46 = { theme = "${theme.nvchadTheme}" }
       return M
     '';
+    extraConfig = builtins.readFile ./config.lua;
     extraPlugins = ''
       local specs = (function()
       ${builtins.readFile ./plugins.lua}

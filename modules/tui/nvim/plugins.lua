@@ -46,6 +46,31 @@ return {
     },
   },
 
+  -- Jump to any visible text in a few keystrokes.
+  {
+    "folke/flash.nvim",
+    event = "VeryLazy",
+    opts = {},
+    keys = {
+      {
+        "s",
+        mode = { "n", "x", "o" },
+        function()
+          require("flash").jump()
+        end,
+        desc = "Flash",
+      },
+      {
+        "S",
+        mode = { "n", "x", "o" },
+        function()
+          require("flash").treesitter()
+        end,
+        desc = "Flash treesitter",
+      },
+    },
+  },
+
   -- Animated cursor trail; works in the terminal.
   {
     "sphamba/smear-cursor.nvim",
