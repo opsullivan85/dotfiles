@@ -90,6 +90,10 @@
 
   nixpkgs.config.allowUnfree = true;
 
+  # Lets generic Linux binaries run, e.g. the standalone Pythons uv downloads
+  # (see modules/dev/python.nix). Add libraries here if a wheel needs one.
+  programs.nix-ld.enable = true;
+
   # Steam needs system-level pieces (32-bit graphics, udev, firewall).
   programs.steam.enable = true;
 
