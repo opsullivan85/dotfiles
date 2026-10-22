@@ -20,6 +20,11 @@
       default = [ ];
       description = "Treesitter parsers to install.";
     };
+    luaConfig = lib.mkOption {
+      type = lib.types.listOf lib.types.lines;
+      default = [ ];
+      description = "Extra lua appended to the nvim config (filetype tweaks, options, ...).";
+    };
     plugins = lib.mkOption {
       type = lib.types.listOf lib.types.lines;
       default = [ ];

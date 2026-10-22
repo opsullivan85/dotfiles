@@ -15,8 +15,10 @@ _:
     shellAliases.l = "ls -F";
 
     initContent = ''
-      # Tab completion ignores case and treats - and _ as interchangeable
-      zstyle ':completion:*' matcher-list 'm:{a-zA-Z-_}={A-Za-z_-}'
+      # Tab completion: exact prefix, then case-insensitive (- and _ interchangeable),
+      # then substring (e.g. "cd work<tab>" -> locus_worktrees)
+      zstyle ':completion:*' matcher-list \
+        ''' 'm:{a-zA-Z-_}={A-Za-z_-}' 'l:|=* r:|=*'
 
       # Ctrl+Left/Right jump over words
       bindkey '^[[1;5D' backward-word

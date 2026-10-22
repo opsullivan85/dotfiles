@@ -37,8 +37,10 @@
     ../../modules/gui/vscode.nix
 
     ../../modules/dev/python.nix
+    ../../modules/dev/python-toolchain.nix
     ../../modules/dev/rust.nix
     ../../modules/dev/cpp.nix
+    ../../modules/dev/cpp-toolchain.nix
     ../../modules/dev/latex.nix
     ../../modules/dev/godot.nix
   ];

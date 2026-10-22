@@ -5,6 +5,11 @@ Stages everything first (flakes only see git-tracked files), runs the
 pre-commit checks, builds + activates, and commits only if that worked, so
 broken configs never land in history. Nix's noisy output goes to a log
 under ~/.local/state/dotfiles/logs; the terminal gets a summary.
+
+The stage/check/build/commit flow itself lives in dotlib.rebuild, shared with
+other repos that consume this one (see dotlib/rebuild.py); this script only
+owns what's specific to a NixOS/home-manager host: the build command, sudo,
+generation lookup, and closure diffing.
 """
 
 from __future__ import annotations
@@ -13,24 +18,18 @@ import argparse
 import json
 import os
 import re
-import shutil
 import socket
-import subprocess
 import sys
 import time
 from pathlib import Path
 
-from dotlib import ui
+from dotlib import rebuild, ui
 
 REPO = Path(__file__).resolve().parent.parent
 NIX = ["nix", "--extra-experimental-features", "nix-command flakes"]
 DEFAULT_NIXOS_HOST = "laptop"
 IS_NIXOS = Path("/etc/NIXOS").exists()
 THEME_FILE = Path.home() / ".local/state/dotfiles/theme.json"
-
-
-def git(*args: str) -> ui.Result:
-    return ui.run("git " + args[0], ["git", *args], cwd=REPO, verbose=False)
 
 
 def parse() -> tuple[argparse.Namespace, list[str]]:
@@ -77,44 +76,6 @@ def parse() -> tuple[argparse.Namespace, list[str]]:
         help="stream full Nix output instead of a spinner (through nom, if installed)",
     )
     return p.parse_known_args()
-
-
-def stage() -> bool:
-    res = git("add", "-A")
-    if not res.ok:
-        ui.line(ui.FAIL, "Staging failed")
-        ui.note(res.text)
-        return False
-    changed = ui.capture(["git", "diff", "--cached", "--name-only"], cwd=REPO).splitlines()
-    ui.line(
-        ui.OK,
-        "Staged",
-        f"{len(changed)} changed file{'s' if len(changed) != 1 else ''}" if changed else "no changes",
-    )
-    return True
-
-
-def checks(log: Path, verbose: bool) -> bool:
-    """Run the pre-commit hooks on staged files; one retry after auto-fixes."""
-    cmd = [REPO / "scripts/in-devshell", "pre-commit", "run"]
-    res = ui.run("Checking", cmd, log=log, verbose=verbose, cwd=REPO)
-    if not res.ok and ui.capture(["git", "diff", "--name-only"], cwd=REPO):
-        git("add", "-A")  # formatters rewrote files; take their fixes
-        res = ui.run("Checking (after auto-fixes)", cmd, log=log, verbose=verbose, cwd=REPO)
-        if res.ok:
-            ui.line(
-                ui.OK,
-                "Checks",
-                f"passed after auto-formatting  ·  {ui.fmt_duration(res.seconds)}",
-            )
-            return True
-    if res.ok:
-        ui.line(ui.OK, "Checks", ui.fmt_duration(res.seconds))
-        return True
-    ui.line(ui.FAIL, "Checks failed")
-    failed = [ui.strip_ansi(r) for r in res.lines if r.strip() and not r.startswith("[")]
-    ui.note("\n".join(failed[-25:]))
-    return False
 
 
 def set_theme(args: argparse.Namespace) -> None:
@@ -175,26 +136,6 @@ def build_command(args: argparse.Namespace, extra: list[str]) -> tuple[list[str]
     ], f"home-manager · {target}"
 
 
-def build(cmd: list[str], log: Path, verbose: bool) -> ui.Result:
-    """Run the build; with -v and nom on PATH, show nom's live build tree.
-
-    nom needs the terminal, so its output isn't captured: the log only gets
-    the command, and a failure points at the scrollback instead of a summary.
-    """
-    nom = shutil.which("nom")
-    if not (verbose and nom and ui.TTY):
-        return ui.run("Building and activating", cmd, log=log, verbose=verbose, cwd=REPO)
-    start = time.monotonic()
-    with log.open("a") as f:
-        f.write(f"$ {' '.join(cmd)}  (via nom)\n")
-    code = subprocess.run(
-        ["bash", "-c", 'set -o pipefail; "$@" --log-format internal-json -v 2>&1 | nom --json', "_", *cmd],
-        check=False,
-        cwd=REPO,
-    ).returncode
-    return ui.Result(code, [], time.monotonic() - start)
-
-
 def generation() -> str:
     """Current system (NixOS) or home-manager generation number, if known."""
     if IS_NIXOS:
@@ -223,25 +164,6 @@ def show_changes(before: str) -> None:
         ui.note(f"… and {len(rows) - 12} more (nix store diff-closures)", indent=6)
 
 
-def commit(message: str | None, gen: str, ran_checks: bool) -> bool:
-    if not ui.capture(["git", "diff", "--cached", "--name-only"], cwd=REPO):
-        ui.line(ui.SKIP, "Nothing to commit")
-        return True
-    auto = f"rebuild: generation {gen}" if gen else "rebuild"
-    text = f"{message}\n\n{auto}" if message else auto
-    cmd = ["git", "commit", "-m", text]
-    if ran_checks:
-        cmd.append("--no-verify")  # hooks just passed on exactly these files
-    res = ui.run("Committing", cmd, cwd=REPO)
-    if not res.ok:
-        ui.line(ui.FAIL, "Commit failed (the system itself was switched fine)")
-        ui.note(res.text)
-        return False
-    short = ui.capture(["git", "rev-parse", "--short", "HEAD"], cwd=REPO)
-    ui.line(ui.OK, "Committed", f"{short}  {message or auto}")
-    return True
-
-
 def main() -> int:
     args, extra = parse()
     if (args.variant or args.nvchad or args.vscode) and not args.theme:
@@ -260,38 +182,30 @@ def main() -> int:
     log = ui.new_log("rebuild")
     started = time.monotonic()
 
-    if not stage():
+    if not rebuild.stage(REPO):
         return 1
     ran_checks = False
     if not args.no_check:
-        if not checks(log, args.verbose):
+        check_cmd = [REPO / "scripts/in-devshell", "pre-commit", "run"]
+        if not rebuild.run_checks(REPO, check_cmd, log, args.verbose):
             ui.note(f"Full log: {ui.pretty_path(log)}")
             return 1
         ran_checks = True
 
     before = os.path.realpath("/run/current-system") if IS_NIXOS else ""
-    res = build(cmd, log, args.verbose)
+    res = rebuild.build(cmd, REPO, log, args.verbose)
     if not res.ok:
-        ui.line(ui.FAIL, "Build failed", ui.fmt_duration(res.seconds))
-        print()
-        ui.note(ui.nix_error_summary(res.lines), indent=4)
-        print(f"\n  {ui.paint('Full log:', 'bold')} {ui.pretty_path(log)}")
+        rebuild.report_build_failure(res, log)
         return res.code or 1
 
     gen = generation()
-    label = f"generation {gen}" if gen else "new generation"
-    ui.line(ui.OK, f"Activated {label}", ui.fmt_duration(res.seconds))
-    warnings = ui.nix_warnings(res.lines)
-    if warnings:
-        ui.line(ui.WARN, f"{len(warnings)} warning{'s' if len(warnings) != 1 else ''}")
-        for w in warnings[:5]:
-            print(f"      {ui.paint(ui.fit(w, ui.width() - 8), 'yellow')}")
+    rebuild.report_build_success(res, gen)
     if IS_NIXOS:
         show_changes(before)
 
     if args.no_commit:
         ui.line(ui.SKIP, "Commit skipped", "--no-commit")
-    elif not commit(args.message, gen, ran_checks):
+    elif not rebuild.commit(REPO, args.message, gen, ran_checks):
         return 1
 
     print(
