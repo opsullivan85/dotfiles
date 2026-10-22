@@ -10,7 +10,6 @@ in
   home.packages = with pkgs; [
     clang
     clang-tools # clangd, clang-format, clang-tidy
-    cmake
     ninja
     lldb
     gdb
