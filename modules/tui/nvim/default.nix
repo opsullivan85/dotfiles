@@ -42,6 +42,10 @@ in
 
   # Lives here, not in zsh.nix, so it only exists on machines that have nvim.
   programs.zsh.shellAliases.vim = "nvim";
+  home.sessionVariables = {
+    EDITOR = "nvim";
+    VISUAL = "nvim";
+  };
 
   # nix4nvchad pins the NvChad starter and copies it to ~/.config/nvim on each
   # activation (a writable copy, so edits there are overwritten by the next
