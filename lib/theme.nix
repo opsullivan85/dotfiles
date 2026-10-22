@@ -46,6 +46,16 @@ in
   inherit (chosen) polarity nvchadTheme vscodeTheme;
   base16Scheme = "${pkgs.base16-schemes}/share/themes/${chosen.scheme}.yaml";
 
+  # Hex (no '#') halfway between base00 (terminal background) and base01: the
+  # off-background colour of the p10k prompt bar and the tmux status bar.
+  panelBg = pkgs.runCommand "panel-bg" { } ''
+    scheme=${pkgs.base16-schemes}/share/themes/${chosen.scheme}.yaml
+    base() { sed -nE "s/^ *base$1: *[\"']?#?([0-9a-fA-F]{6}).*/\1/p" "$scheme"; }
+    a=$(base 00)
+    b=$(base 01)
+    for c in 0 2 4; do printf '%02x' $(( (0x''${a:$c:2} + 0x''${b:$c:2}) / 2 )); done > $out
+  '';
+
   cursor = {
     package = pkgs.bibata-cursors;
     name = "Bibata-Modern-Classic";

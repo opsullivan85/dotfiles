@@ -1,5 +1,15 @@
-{ config, pkgs, ... }:
+{
+  pkgs,
+  theme,
+  ...
+}:
 
+let
+  # Same off-background as the p10k prompt bar (see theme.panelBg).
+  statusColors = pkgs.runCommand "tmux-status.conf" { } ''
+    echo "set -ag status-style bg=#$(cat ${theme.panelBg})" > $out
+  '';
+in
 {
   programs.tmux = {
     enable = true;
@@ -23,6 +33,7 @@
       # Status bar content (colors come from Stylix). The battery segment
       # prints nothing on machines without /sys/class/power_supply/BAT*,
       # so this stays portable to desktops.
+      source-file ${statusColors}
       set -g status-interval 15
       set -g status-left-length 30
       set -g status-right-length 60

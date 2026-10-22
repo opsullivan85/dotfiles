@@ -26,14 +26,10 @@ let
   p10kColors = pkgs.runCommand "p10k-colors.zsh" { } ''
     scheme=${theme.base16Scheme}
     base() { sed -nE "s/^ *base$1: *[\"']?#?([0-9a-fA-F]{6}).*/\1/p" "$scheme"; }
-    # bg sits halfway between base00 (terminal background) and base01.
-    mix() {
-      local a=$1 b=$2 c
-      for c in 0 2 4; do printf '%02x' $(( (0x''${a:$c:2} + 0x''${b:$c:2}) / 2 )); done
-    }
+    bg=$(cat ${theme.panelBg})
     {
-    echo "typeset -g p10k_bg='#$(mix "$(base 00)" "$(base 01)")'"
-    echo "typeset -g p10k_f_bg='%F{#$(mix "$(base 00)" "$(base 01)")}'"
+    echo "typeset -g p10k_bg='#$bg'"
+    echo "typeset -g p10k_f_bg='%F{#$bg}'"
     ${builtins.concatStringsSep "\n" (
       pkgs.lib.mapAttrsToList (role: slot: ''
         hex=$(base ${slot})
