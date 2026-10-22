@@ -27,6 +27,7 @@
     ../../modules/tui/keifu.nix
     ../../modules/tui/nvim
 
+    ../../modules/gui/alacritty.nix
     ../../modules/gui/brave.nix
     ../../modules/gui/pqiv.nix
     ../../modules/gui/discord.nix

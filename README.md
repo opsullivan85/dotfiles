@@ -16,7 +16,7 @@ modules/             one file per tool, grouped by kind, opted into per machine:
   cli/               git, gh, tldr, home-manager
   tui/               btop, keifu, claude-code, chat, nvim/ (a unit that needs several
                      files is a folder with a default.nix)
-  gui/               brave, pqiv
+  gui/               alacritty, brave, pqiv
   dev/               one file per language (python, rust, godot…)
 tools/               our own CLI tools, one dir each (bash, Python, Rust…), built by Nix;
                      `nix run .#<name>` to try one, install via a wrapper in modules/

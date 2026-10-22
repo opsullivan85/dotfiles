@@ -55,6 +55,7 @@ Note there is no always-on core: the private machine file lists everything it wa
        m.cli-home-manager
        m.cli-gh
        m.tui-btop
+       m.gui-alacritty
        m.gui-brave
        m.tui-nvim
        m.dev-python
