@@ -5,10 +5,13 @@ let
 in
 
 {
+  # The actual compiler/build-system binaries (clang, cmake) live in the
+  # separate dev-cpp-toolchain module so machines can opt out (e.g. when a
+  # compiler and build system are already managed system-wide, as with
+  # locus-pocus on ROS/catkin laptops) without losing clangd/tooling here.
   imports = [ ../tui/nvim/options.nix ];
 
   home.packages = with pkgs; [
-    clang
     clang-tools # clangd, clang-format, clang-tidy
     ninja
     lldb
