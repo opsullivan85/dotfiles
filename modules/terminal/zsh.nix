@@ -11,6 +11,14 @@ _:
     autosuggestion.enable = true;
     syntaxHighlighting.enable = true;
 
+    history = {
+      size = 50000;
+      save = 50000;
+      ignoreAllDups = true;
+      share = true;
+      extended = true; # record timestamps
+    };
+
     shellAliases.open = "xdg-open";
     shellAliases.l = "ls -F";
 
