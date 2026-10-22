@@ -1,11 +1,14 @@
 { pkgs, ... }:
 
 {
+  # The actual interpreter binary (python3) lives in the separate
+  # dev-python-toolchain module so machines can opt out (e.g. when the
+  # interpreter is already managed system-wide, as with locus-pocus on
+  # ROS/catkin laptops) without losing ruff/basedpyright tooling here.
   imports = [ ../tui/nvim/options.nix ];
 
   home.packages = with pkgs; [
     uv
-    python3 # fallback interpreter; uv downloads others as needed
     ruff # linter + formatter
     basedpyright # LSP / type checking
   ];
