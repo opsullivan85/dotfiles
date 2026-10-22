@@ -27,5 +27,6 @@
     ms-python.python
     charliermarsh.ruff
     detachhead.basedpyright
+    ms-toolsai.jupyter
   ];
 }
