@@ -13,6 +13,7 @@
     ../../modules/cli/copy.nix
     ../../modules/cli/delta.nix
     ../../modules/cli/eza.nix
+    ../../modules/cli/fd.nix
     ../../modules/cli/git.nix
     ../../modules/cli/gh.nix
     ../../modules/cli/home-manager.nix
@@ -26,6 +27,7 @@
     ../../modules/tui/claude-code.nix
     ../../modules/tui/keifu.nix
     ../../modules/tui/nvim
+    ../../modules/tui/yazi.nix
 
     ../../modules/gui/alacritty.nix
     ../../modules/gui/brave.nix
