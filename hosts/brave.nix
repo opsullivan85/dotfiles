@@ -20,5 +20,12 @@
     BraveWalletDisabled = true;
     BraveNewsDisabled = true;
     BraveTalkDisabled = true;
+
+    # Default search engine: DuckDuckGo
+    DefaultSearchProviderEnabled = true;
+    DefaultSearchProviderName = "DuckDuckGo";
+    DefaultSearchProviderKeyword = "ddg";
+    DefaultSearchProviderSearchURL = "https://duckduckgo.com/?q={searchTerms}";
+    DefaultSearchProviderSuggestURL = "https://duckduckgo.com/ac/?q={searchTerms}&type=list";
   };
 }
