@@ -25,6 +25,7 @@
     ../../modules/tui/btop.nix
     ../../modules/tui/chat.nix
     ../../modules/tui/claude-code.nix
+    ../../modules/tui/jn.nix
     ../../modules/tui/keifu.nix
     ../../modules/tui/nvim
     ../../modules/tui/yazi.nix

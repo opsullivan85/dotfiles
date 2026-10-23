@@ -160,6 +160,26 @@
         "type": "github"
       }
     },
+    "jn": {
+      "inputs": {
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1792600689,
+        "narHash": "sha256-Yi7ENFRObpIt1nSRJFYLFs70c31jHT+WHXwGvh8oFBo=",
+        "owner": "joereynolds",
+        "repo": "jn",
+        "rev": "7efbdaa3daffa9f0e5e6f87775d7d346c5fcebd3",
+        "type": "github"
+      },
+      "original": {
+        "owner": "joereynolds",
+        "repo": "jn",
+        "type": "github"
+      }
+    },
     "nix4nvchad": {
       "inputs": {
         "nixpkgs": [
@@ -274,6 +294,7 @@
     "root": {
       "inputs": {
         "home-manager": "home-manager",
+        "jn": "jn",
         "nix4nvchad": "nix4nvchad",
         "nixpkgs": "nixpkgs",
         "noctalia": "noctalia",
