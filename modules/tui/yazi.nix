@@ -8,7 +8,7 @@
     # to vim on machines without it. Yazi's default opener would use nano.
     settings.opener.edit = [
       {
-        run = ''${"$"}{EDITOR:-vim} "$@"'';
+        run = "${"$"}{EDITOR:-vim} %s";
         block = true;
         desc = "$EDITOR";
         for = "unix";
