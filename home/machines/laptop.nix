@@ -12,6 +12,7 @@
     ../../modules/cli/bat.nix
     ../../modules/cli/copy.nix
     ../../modules/cli/delta.nix
+    ../../modules/cli/direnv.nix
     ../../modules/cli/eza.nix
     ../../modules/cli/fd.nix
     ../../modules/cli/git.nix
