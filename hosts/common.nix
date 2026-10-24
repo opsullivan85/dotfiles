@@ -1,5 +1,10 @@
 # Settings shared by every NixOS host. Host-specific ones live in hosts/<name>/.
-{ pkgs, ... }:
+{
+  config,
+  lib,
+  pkgs,
+  ...
+}:
 
 {
   imports = [ ./brave.nix ];
@@ -15,15 +20,19 @@
   # Libraries such binaries dlopen at runtime, e.g. miniquad games
   # (libX11 and friends, GL, Wayland).
   programs.nix-ld.libraries = with pkgs; [
-    xorg.libX11
-    xorg.libXi
-    xorg.libXcursor
-    xorg.libXrandr
+    libx11
+    libxi
+    libxcursor
+    libxrandr
     libxkbcommon
     libGL
     wayland
     alsa-lib
   ];
+
+  # Nix-linked binaries (e.g. cargo builds via nixpkgs' clang) use Nix's glibc
+  # loader, which ignores nix-ld, so expose the same libraries to them directly.
+  environment.variables.LD_LIBRARY_PATH = lib.makeLibraryPath config.programs.nix-ld.libraries;
 
   # Every rebuild adds a generation; without this the store only grows.
   nix.gc = {
