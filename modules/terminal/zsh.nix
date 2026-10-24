@@ -21,6 +21,9 @@ _:
 
     shellAliases.open = "xdg-open";
     shellAliases.l = "ls -F";
+    # `cmd | plain`: strip ANSI escape sequences (colours, cursor moves)
+    # (LC_ALL=C: the [@-~] range misbehaves in UTF-8 locales)
+    shellAliases.plain = ''LC_ALL=C sed -E 's/\x1b\[[0-9;?]*[ -\/]*[@-~]//g' '';
 
     initContent = ''
       # Tab completion: exact prefix, then case-insensitive (- and _ interchangeable),
