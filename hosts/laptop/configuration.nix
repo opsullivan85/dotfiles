@@ -62,6 +62,9 @@
   # wifi/bluetooth/power/battery widgets.
   hardware.bluetooth.enable = true;
   services.power-profiles-daemon.enable = true;
+  # Thunar: trash, mounting, network shares and thumbnails.
+  services.gvfs.enable = true;
+  services.tumbler.enable = true;
   services.upower.enable = true;
 
   services.pulseaudio.enable = false;

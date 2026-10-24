@@ -14,5 +14,15 @@
         for = "unix";
       }
     ];
+
+    # Ctrl-n: drag the selected (or hovered) files into another app via ripdrag
+    # (modules/gui/ripdrag.nix).
+    keymap.mgr.prepend_keymap = [
+      {
+        on = "<C-n>";
+        run = ''shell -- drag "$@" 2>/dev/null &'';
+        desc = "Drag and drop selected files";
+      }
+    ];
   };
 }

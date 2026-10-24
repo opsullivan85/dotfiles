@@ -5,6 +5,13 @@
 
   home.packages = [ pkgs.claude-code ];
 
+  # Claude Code registers this URL handler itself and writes ~/.config/mimeapps.list to do it;
+  # declaring it keeps that file home-manager-managed (delete the plain file once).
+  xdg.mimeApps = {
+    enable = true;
+    defaultApplications."x-scheme-handler/claude-cli" = "claude-code-url-handler.desktop";
+  };
+
   # No-op on machines without modules/tui/nvim; lazy.nvim fetches the plugin.
   # <leader>a* maps are provided by the plugin's lazy `keys`.
   dev.nvim.plugins = [

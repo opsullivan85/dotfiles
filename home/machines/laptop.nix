@@ -34,6 +34,8 @@
     ../../modules/gui/alacritty.nix
     ../../modules/gui/brave.nix
     ../../modules/gui/imv.nix
+    ../../modules/gui/ripdrag.nix
+    ../../modules/gui/thunar.nix
     ../../modules/gui/discord.nix
     ../../modules/gui/freecad.nix
     ../../modules/gui/pinta.nix
