@@ -33,7 +33,7 @@
 
     ../../modules/gui/alacritty.nix
     ../../modules/gui/brave.nix
-    ../../modules/gui/pqiv.nix
+    ../../modules/gui/imv.nix
     ../../modules/gui/discord.nix
     ../../modules/gui/freecad.nix
     ../../modules/gui/pinta.nix
