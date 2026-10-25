@@ -16,6 +16,8 @@ in
     ninja
     lldb
     gdb
+    valgrind
+    perf
     bear # generate compile_commands.json for non-CMake builds
   ];
 

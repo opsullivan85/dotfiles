@@ -87,6 +87,7 @@
       "networkmanager"
       "wheel"
       "video"
+      "docker" # root-equivalent: anyone in it can mount / into a container
     ];
     shell = pkgs.zsh;
   };
@@ -96,6 +97,9 @@
   # Lets generic Linux binaries run, e.g. the standalone Pythons uv downloads
   # (see modules/dev/python.nix). Add libraries here if a wheel needs one.
   programs.nix-ld.enable = true;
+
+  # Docker's daemon is system-level, so it can't be a home-manager unit.
+  virtualisation.docker.enable = true;
 
   # Steam needs system-level pieces (32-bit graphics, udev, firewall).
   programs.steam.enable = true;
