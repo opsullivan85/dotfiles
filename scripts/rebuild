@@ -18,6 +18,7 @@ import argparse
 import json
 import os
 import re
+import shutil
 import socket
 import sys
 import time
@@ -30,6 +31,8 @@ NIX = ["nix", "--extra-experimental-features", "nix-command flakes"]
 DEFAULT_NIXOS_HOST = "laptop"
 IS_NIXOS = Path("/etc/NIXOS").exists()
 THEME_FILE = Path.home() / ".local/state/dotfiles/theme.json"
+NVIM_LOCK = Path.home() / ".config/nvim/lazy-lock.json"
+REPO_NVIM_LOCK = REPO / "modules/tui/nvim/lazy-lock.json"
 
 
 def parse() -> tuple[argparse.Namespace, list[str]]:
@@ -164,6 +167,27 @@ def show_changes(before: str) -> None:
         ui.note(f"… and {len(rows) - 12} more (nix store diff-closures)", indent=6)
 
 
+def sync_nvim_lock(log: Path) -> None:
+    """Install new nvim plugins and stage lazy.nvim's lockfile for the commit.
+
+    The switch just copied the repo's lockfile to NVIM_LOCK; `Lazy! install`
+    fetches plugins added since and rewrites it from what's installed, which
+    also picks up a `:Lazy update` done in nvim since the last rebuild.
+    """
+    if not (shutil.which("nvim") and NVIM_LOCK.exists()):
+        return
+    res = ui.run("Installing nvim plugins", ["nvim", "--headless", "+Lazy! install", "+qa"], log=log)
+    if not res.ok:
+        ui.line(ui.WARN, "nvim plugin install failed", f"lockfile not updated · {ui.pretty_path(log)}")
+        return
+    if NVIM_LOCK.read_bytes() == REPO_NVIM_LOCK.read_bytes():
+        ui.line(ui.OK, "nvim plugins", "lockfile unchanged")
+        return
+    shutil.copyfile(NVIM_LOCK, REPO_NVIM_LOCK)
+    rebuild.git(REPO, "add", str(REPO_NVIM_LOCK))
+    ui.line(ui.OK, "nvim plugins", f"updated {REPO_NVIM_LOCK.relative_to(REPO)}")
+
+
 def main() -> int:
     args, extra = parse()
     if (args.variant or args.nvchad or args.vscode) and not args.theme:
@@ -202,6 +226,8 @@ def main() -> int:
     rebuild.report_build_success(res, gen)
     if IS_NIXOS:
         show_changes(before)
+    if not args.boot:  # with --boot, ~/.config/nvim isn't switched yet
+        sync_nvim_lock(log)
 
     if args.no_commit:
         ui.line(ui.SKIP, "Commit skipped", "--no-commit")

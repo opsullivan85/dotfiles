@@ -16,6 +16,7 @@
     ../../modules/cli/eza.nix
     ../../modules/cli/fd.nix
     ../../modules/cli/git.nix
+    ../../modules/cli/glow.nix
     ../../modules/cli/gh.nix
     ../../modules/cli/home-manager.nix
     ../../modules/cli/jq.nix
@@ -50,6 +51,7 @@
     ../../modules/dev/cpp.nix
     ../../modules/dev/cpp-toolchain.nix
     ../../modules/dev/latex.nix
+    ../../modules/dev/markdown.nix
     ../../modules/dev/godot.nix
   ];
 

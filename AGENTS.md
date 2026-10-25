@@ -43,6 +43,6 @@ Pre-commit (installed by `scripts/bootstrap`) runs nixfmt, statix, deadnix, ruff
 - tmux: `%` in status strings is strftime-expanded, so write `%%`.
 - NvChad's `init.lua` `dofile`s files under `~/.local/share/nvim/base46/`; don't delete that directory. Regenerate with `require('base46').compile()`.
 - `programs.neovim.enable` and `programs.nvchad.enable` are mutually exclusive (nix4nvchad asserts it).
-- Update `modules/tui/nvim/lazy-lock.json` by hand: run `:Lazy update` in nvim, then copy `~/.config/nvim/lazy-lock.json` into the repo.
+- `modules/tui/nvim/lazy-lock.json` is kept in sync by `scripts/rebuild`: after switching it runs `nvim --headless "+Lazy! install"` and stages `~/.config/nvim/lazy-lock.json` into the generation commit. That covers newly added plugins and any `:Lazy update` done in nvim since. Don't hand-edit the lockfile.
 - Manual sync points: `nvchadTheme` vs `base16Scheme` in `lib/theme.nix`; Noctalia GUI changes (`~/.local/state/noctalia/settings.toml`) back into `home/os/nixos/noctalia.nix`.
 - Work identity and anything else work-specific belong in the private repo; don't add it here or invent values.
