@@ -1,4 +1,4 @@
-{ pkgs, ... }:
+{ pkgs, theme, ... }:
 
 {
   # Renders markdown in the terminal; with no arguments, browses the markdown
@@ -6,14 +6,15 @@
   home.packages = [ pkgs.glow ];
   programs.zsh.shellAliases.md = "glow";
 
-  # Preview markdown through glow in yazi. No-op on machines without
-  # modules/tui/yazi.nix.
+  # Preview markdown through glow in yazi, via piper (runs a command as a
+  # previewer). No-op on machines without modules/tui/yazi.nix.
   programs.yazi = {
-    plugins.glow = pkgs.yaziPlugins.glow;
+    plugins.piper = pkgs.yaziPlugins.piper;
     settings.plugin.prepend_previewers = [
       {
         url = "*.md";
-        run = "glow";
+        # No TTY here, so glow can't pick dark/light itself.
+        run = ''piper -- CLICOLOR_FORCE=1 glow -w=$w -s=${theme.polarity} "$1"'';
       }
     ];
   };
