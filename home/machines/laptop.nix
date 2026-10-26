@@ -21,6 +21,7 @@
     ../../modules/cli/gh.nix
     ../../modules/cli/home-manager.nix
     ../../modules/cli/jq.nix
+    ../../modules/cli/lazygit.nix
     ../../modules/cli/nmap.nix
     ../../modules/cli/nom.nix
     ../../modules/cli/ripgrep.nix
