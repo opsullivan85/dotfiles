@@ -35,6 +35,12 @@ _:
       bindkey '^[[1;5D' backward-word
       bindkey '^[[1;5C' forward-word
 
+      # System specs + outstanding jn todos, same as everyone's neofetch-style
+      # terminal greeting (see modules/terminal/fastfetch.nix).
+      if [[ -o interactive ]] && command -v fastfetch >/dev/null; then
+        fastfetch
+      fi
+
       # Each terminal gets its own independent tmux session (not a shared
       # one — that's what caused typing to mirror across every window).
       # Escape hatch if tmux is ever broken: NO_TMUX=1 zsh
