@@ -25,6 +25,7 @@
     ../../modules/cli/nom.nix
     ../../modules/cli/ripgrep.nix
     ../../modules/cli/tldr.nix
+    ../../modules/cli/unzip.nix
 
     ../../modules/tui/btop.nix
     ../../modules/tui/chat.nix
