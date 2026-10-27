@@ -30,6 +30,7 @@ _:
       # then substring (e.g. "cd work<tab>" -> locus_worktrees)
       zstyle ':completion:*' matcher-list \
         ''' 'm:{a-zA-Z-_}={A-Za-z_-}' 'l:|=* r:|=*'
+      zstyle ':completion:*' menu select
 
       # Ctrl+Left/Right jump over words
       bindkey '^[[1;5D' backward-word

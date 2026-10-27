@@ -56,6 +56,7 @@ in
     initContent = lib.mkBefore ''
       source ~/.p10k-colors.zsh
       [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
+      zle_highlight=(''${(@)zle_highlight:#region:*} "region:bg=$p10k_bg,fg=$p10k_fg")
     '';
   };
 }

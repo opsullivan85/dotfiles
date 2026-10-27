@@ -18,6 +18,7 @@ fi
 
 # No local clipboard (ssh, tty): ask the terminal via an OSC 52 escape.
 # Inside tmux the sequence must be wrapped to pass through.
+echo "warning: no clipboard utility found; trying terminal OSC 52 fallback" >&2
 payload=$(base64 | tr -d '\n')
 if [[ -n "${TMUX:-}" ]]; then
   printf '\033Ptmux;\033\033]52;c;%s\a\033\134' "$payload" >/dev/tty

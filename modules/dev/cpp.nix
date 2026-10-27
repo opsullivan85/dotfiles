@@ -11,6 +11,12 @@ in
   # locus-pocus on ROS/catkin laptops) without losing clangd/tooling here.
   imports = [ ../tui/nvim/options.nix ];
 
+  programs.git.ignores = [
+    ".clangd"
+    "compile_commands.json"
+    "build"
+  ];
+
   home.packages = with pkgs; [
     clang-tools # clangd, clang-format, clang-tidy
     ninja
