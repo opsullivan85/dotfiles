@@ -8,6 +8,7 @@
     ../../modules/terminal/zsh.nix
     ../../modules/terminal/p10k
     ../../modules/terminal/tmux.nix
+    ../../modules/terminal/fastfetch.nix
 
     ../../modules/cli/bat.nix
     ../../modules/cli/copy.nix
