@@ -54,7 +54,7 @@ def main() -> None:
     if key is None:
         parser.error(f"unknown key: {args.key}")
 
-    model = WhisperModel(args.model, device="@DEVICE@", compute_type="@COMPUTE_TYPE@")
+    model = WhisperModel(args.model, device="auto", compute_type="auto")
     transcribe_lock = threading.Lock()
     recorder = None
     audio_path = None
@@ -65,7 +65,8 @@ def main() -> None:
                 segments, _info = model.transcribe(str(path), language=args.language)
                 text = " ".join(segment.text.strip() for segment in segments).strip()
             if text:
-                subprocess.run([XDOTOOL, "type", "--clearmodifiers", "--", text], check=True)
+                # xdotool's default 12 ms per character makes long transcripts slow to type.
+                subprocess.run([XDOTOOL, "type", "--clearmodifiers", "--delay", "2", "--", text], check=True)
         finally:
             shutil.rmtree(path.parent, ignore_errors=True)
 

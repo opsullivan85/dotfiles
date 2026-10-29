@@ -15,8 +15,8 @@ def main() -> None:
         "--language",
         help="language code such as en (default: auto-detect)",
     )
-    parser.add_argument("--device", default="@DEVICE@")
-    parser.add_argument("--compute-type", default="@COMPUTE_TYPE@")
+    parser.add_argument("--device", default="auto", help="cpu, cuda, or auto (default: auto)")
+    parser.add_argument("--compute-type", default="auto", help="e.g. int8, float16 (default: auto)")
     args = parser.parse_args()
 
     model = WhisperModel(args.model, device=args.device, compute_type=args.compute_type)
