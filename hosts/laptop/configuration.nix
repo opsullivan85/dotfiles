@@ -88,6 +88,7 @@
       "wheel"
       "video"
       "docker" # root-equivalent: anyone in it can mount / into a container
+      "wireshark" # lets dumpcap capture packets without sudo
     ];
     shell = pkgs.zsh;
   };
@@ -103,6 +104,14 @@
 
   # Steam needs system-level pieces (32-bit graphics, udev, firewall).
   programs.steam.enable = true;
+
+  # Wireshark installs system-wide and wraps dumpcap with the capabilities it
+  # needs, so the GUI runs as you (no sudo, which breaks X auth). Membership in
+  # the "wireshark" group (above) is what allows capturing.
+  programs.wireshark = {
+    enable = true;
+    package = pkgs.wireshark; # the Qt GUI; the module's default is CLI-only
+  };
 
   # NvChad's docs recommend this specific font (not the "Mono" variant —
   # icons render smaller with that one) for its file/status icons.
