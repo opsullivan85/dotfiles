@@ -55,6 +55,7 @@
     ../../modules/dev/rust.nix
     ../../modules/dev/cpp.nix
     ../../modules/dev/cpp-toolchain.nix
+    ../../modules/dev/lua.nix
     ../../modules/dev/latex.nix
     ../../modules/dev/markdown.nix
     ../../modules/dev/pre-commit.nix

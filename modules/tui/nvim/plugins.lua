@@ -5,11 +5,6 @@
 -- Binaries come from Nix (modules/dev/*.nix), not Mason.
 return {
   {
-    "stevearc/conform.nvim",
-    opts = { formatters_by_ft = { lua = { "stylua" } } },
-  },
-
-  {
     "nvim-treesitter/nvim-treesitter",
     opts = { ensure_installed = { "vim", "lua", "vimdoc" } },
     -- The lockfile pins nvim-treesitter's `main` branch, which ignores
