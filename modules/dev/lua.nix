@@ -86,6 +86,8 @@ in
       # The extension defaults to Roblox's globals and sourcemap; this is plain Luau.
       "luau-lsp.platform.type" = "standard";
       "stylua.searchBinaryInPATH" = true;
+      # The Luau extension also claims *.lua, so pin it to sumneko's language.
+      "files.associations"."*.lua" = "lua";
       "[lua]"."editor.defaultFormatter" = "JohnnyMorganz.stylua";
       "[luau]"."editor.defaultFormatter" = "JohnnyMorganz.stylua";
     };
