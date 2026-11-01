@@ -20,6 +20,7 @@ import os
 import re
 import shutil
 import socket
+import subprocess
 import sys
 import time
 from pathlib import Path
@@ -188,6 +189,45 @@ def sync_nvim_lock(log: Path) -> None:
     ui.line(ui.OK, "nvim plugins", f"updated {REPO_NVIM_LOCK.relative_to(REPO)}")
 
 
+def compile_nvim_theme(log: Path) -> None:
+    """Rebuild NvChad's compiled theme cache so nvim picks up a theme change.
+
+    NvChad reads colours from ~/.local/share/nvim/base46/, which nothing else
+    regenerates when chadrc.lua's theme changes. Runs after the plugin install,
+    since base46 is a lazy.nvim plugin.
+    """
+    if not shutil.which("nvim"):
+        return
+    res = ui.run(
+        "Compiling nvim theme",
+        ["nvim", "--headless", "+lua require('base46').compile()", "+qa"],
+        log=log,
+    )
+    if not res.ok:
+        ui.line(ui.WARN, "nvim theme compile failed", f"nvim may show the old theme · {ui.pretty_path(log)}")
+
+
+def refresh_tmux_env() -> None:
+    """Let new tmux panes pick up the switched session variables (theme, fzf).
+
+    A running tmux server keeps the environment it started with, including
+    __HM_SESS_VARS_SOURCED, which stops hm-session-vars.sh from re-exporting
+    anything (e.g. FZF_DEFAULT_OPTS) in new panes. Unsetting the guard in the
+    server's global environment lets the next pane source the new values.
+    Existing panes keep their old environment; new ones get the new one.
+    """
+    if not shutil.which("tmux"):
+        return
+    # Fails harmlessly when no tmux server is running; nothing to refresh then.
+    res = subprocess.run(
+        ["tmux", "set-environment", "-gu", "__HM_SESS_VARS_SOURCED"],
+        capture_output=True,
+        check=False,
+    )
+    if res.returncode == 0:
+        ui.line(ui.OK, "tmux", "new panes reload session variables")
+
+
 def main() -> int:
     args, extra = parse()
     if (args.variant or args.nvchad or args.vscode) and not args.theme:
@@ -228,6 +268,8 @@ def main() -> int:
         show_changes(before)
     if not args.boot:  # with --boot, ~/.config/nvim isn't switched yet
         sync_nvim_lock(log)
+        compile_nvim_theme(log)
+        refresh_tmux_env()
 
     if args.no_commit:
         ui.line(ui.SKIP, "Commit skipped", "--no-commit")
