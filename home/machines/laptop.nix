@@ -42,6 +42,7 @@
     ../../modules/gui/imv.nix
     ../../modules/gui/kooha.nix
     ../../modules/gui/satty.nix
+    ../../modules/gui/shot.nix
     ../../modules/gui/ripdrag.nix
     ../../modules/gui/thunar.nix
     ../../modules/gui/discord.nix
