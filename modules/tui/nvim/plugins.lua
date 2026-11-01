@@ -26,6 +26,7 @@ return {
     "nvim-telescope/telescope.nvim",
     keys = {
       { "grr", "<cmd>Telescope lsp_references<cr>", desc = "LSP references" },
+      { "<leader>fk", "<cmd>Telescope keymaps<cr>", desc = "Find keymaps" },
       {
         "grs",
         function()
