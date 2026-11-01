@@ -104,8 +104,9 @@ binds {
     Shift+Print { spawn "shot" "screen"; }
     // Niri's own screenshot UI, kept as a fallback.
     Ctrl+Print  { screenshot; }
-    // Screen recording: opens Kooha, which records until stopped from its UI.
-    Mod+Print   { spawn "kooha"; }
+    // Screen recording: `record` toggles wf-recorder (see tools/record).
+    Mod+Print       { spawn "record"; }
+    Mod+Shift+Print { spawn "record" "screen"; }
 
     // Brightness keys (built-in panel, via brightnessctl)
     XF86MonBrightnessUp   allow-when-locked=true { spawn "brightnessctl" "set" "5%+"; }
