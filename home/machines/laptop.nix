@@ -40,6 +40,7 @@
     ../../modules/gui/alacritty.nix
     ../../modules/gui/brave.nix
     ../../modules/gui/imv.nix
+    ../../modules/gui/mpv.nix
     ../../modules/gui/record.nix
     ../../modules/gui/satty.nix
     ../../modules/gui/shot.nix
