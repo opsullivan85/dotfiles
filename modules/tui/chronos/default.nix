@@ -17,8 +17,13 @@ let
       pkgs.gnugrep
     ];
     text = ''
-      url_file=${lib.escapeShellArg (toString cfg.urlFile)}
+      url_file=${lib.escapeShellArg (if cfg.urlFile == null then "" else cfg.urlFile)}
       calendar_file=${lib.escapeShellArg "${config.xdg.configHome}/chronos/calendars/outlook.ics"}
+
+      if [[ -z "$url_file" ]]; then
+        printf 'Set programs.chronos.remoteIcs.urlFile to the path of a file containing the HTTPS ICS URL\n' >&2
+        exit 1
+      fi
 
       if [[ ! -r "$url_file" ]]; then
         printf 'Chronos ICS URL file is not readable: %s\n' "$url_file" >&2
@@ -56,6 +61,25 @@ let
       mv -- "$temp_file" "$calendar_file"
     '';
   };
+
+  cal = pkgs.writeShellApplication {
+    name = "cal";
+    runtimeInputs = [
+      inputs.self.packages.${pkgs.system}.chronos
+      refreshRemoteCalendar
+    ];
+    text = ''
+      if [[ "''${1:-}" == fetch ]]; then
+        if (( $# != 1 )); then
+          printf 'Usage: cal fetch\n' >&2
+          exit 2
+        fi
+        exec chronos-refresh-remote-calendar
+      fi
+
+      exec chronos "$@"
+    '';
+  };
 in
 {
   options.programs.chronos.remoteIcs.urlFile = lib.mkOption {
@@ -70,7 +94,10 @@ in
   };
 
   config = {
-    home.packages = [ inputs.self.packages.${pkgs.system}.chronos ];
+    home.packages = [
+      inputs.self.packages.${pkgs.system}.chronos
+      cal
+    ];
 
     systemd.user.services.chronos-remote-ics = lib.mkIf (cfg.urlFile != null) {
       Unit.Description = "Refresh the remote ICS calendar for Chronos";
