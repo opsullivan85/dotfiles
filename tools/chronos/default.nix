@@ -14,5 +14,7 @@ buildGoModule {
     hash = "sha256-WK9iUbBgab3CWm3aoVE8YwhNjWu48ADIeWZQReFr4h0=";
   };
 
+  patches = [ ./12-hour-time.diff ];
+
   vendorHash = "sha256-9Y+ni/48niSNvYy50bleJmfBGWozLLu8efHQf0EZfFs=";
 }

@@ -1,0 +1,75 @@
+diff --git a/types/constants.go b/types/constants.go
+index ad36549..1111111 100644
+--- a/types/constants.go
++++ b/types/constants.go
+@@ -48,1 +48,1 @@
+-	TimeFormat = "%02d:%02d" // displayed in week mode for example
++	TimeFormat = "%2d:%02d %s" // displayed in week mode for example
+@@ -122,1 +122,1 @@
+-	TimeColumnAndPaddingWidth          = len(fmt.Sprintf(TimeFormat, 0, 0)) + TimeColumnLeftPadding + TimeColumnRightPadding
++	TimeColumnAndPaddingWidth          = len(fmt.Sprintf(TimeFormat, 0, 0, "AM")) + TimeColumnLeftPadding + TimeColumnRightPadding
+diff --git a/week_view_grid/render_grid.go b/week_view_grid/render_grid.go
+index 10ee9ea..2222222 100644
+--- a/week_view_grid/render_grid.go
++++ b/week_view_grid/render_grid.go
+@@ -21,1 +21,9 @@
+-		timeStr := fmt.Sprintf(types.TimeFormat, hour, min)
++		displayHour := hour % 12
++		if displayHour == 0 {
++			displayHour = 12
++		}
++		meridiem := "AM"
++		if hour >= 12 {
++			meridiem = "PM"
++		}
++		timeStr := fmt.Sprintf(types.TimeFormat, displayHour, min, meridiem)
+diff --git a/popup/popup_agenda.go b/popup/popup_agenda.go
+index ad457f7..3333333 100644
+--- a/popup/popup_agenda.go
++++ b/popup/popup_agenda.go
+@@ -163,2 +163,2 @@
+-		startTime := event.ComputedStart.Format("15:04")
+-		endTime := event.ComputedEnd.Format("15:04")
++		startTime := event.ComputedStart.Format("3:04 PM")
++		endTime := event.ComputedEnd.Format("3:04 PM")
+diff --git a/status_bar/render_status_bar.go b/status_bar/render_status_bar.go
+index b3e7f05..4444444 100644
+--- a/status_bar/render_status_bar.go
++++ b/status_bar/render_status_bar.go
+@@ -99,1 +99,1 @@
+-			timeRange := fmt.Sprintf("%s - %s", startTime.Format("15:04"), endTime.Format("15:04"))
++			timeRange := fmt.Sprintf("%s - %s", startTime.Format("3:04 PM"), endTime.Format("3:04 PM"))
+diff --git a/timezone/form_integration.go b/timezone/form_integration.go
+index 590816c..5555555 100644
+--- a/timezone/form_integration.go
++++ b/timezone/form_integration.go
+@@ -20,1 +20,1 @@
+-	timeStr = localTime.Format("15:04")
++	timeStr = localTime.Format("3:04 PM")
+diff --git a/timezone/localtime.go b/timezone/localtime.go
+index d0b1bf4..6666666 100644
+--- a/timezone/localtime.go
++++ b/timezone/localtime.go
+@@ -20,1 +20,4 @@
+-	parsedTime, err := time.ParseInLocation("2006-01-02 15:04", dateTimeStr, time.Local)
++	parsedTime, err := time.ParseInLocation("2006-01-02 3:04 PM", dateTimeStr, time.Local)
++	if err != nil {
++		parsedTime, err = time.ParseInLocation("2006-01-02 15:04", dateTimeStr, time.Local)
++	}
+diff --git a/popup_better_forms/huh_selectors.go b/popup_better_forms/huh_selectors.go
+index 748721d..7777777 100644
+--- a/popup_better_forms/huh_selectors.go
++++ b/popup_better_forms/huh_selectors.go
+@@ -100,1 +100,1 @@
+-		Placeholder("14:30").
++		Placeholder("2:30 PM").
+@@ -104,4 +104,5 @@
+-			_, err := time.Parse("15:04", s)
+-			if err != nil {
+-				return fmt.Errorf("invalid time format, use HH:MM")
+-			}
++			if _, err := time.Parse("3:04 PM", s); err != nil {
++				if _, err := time.Parse("15:04", s); err != nil {
++					return fmt.Errorf("invalid time format, use h:mm AM/PM")
++				}
++			}
