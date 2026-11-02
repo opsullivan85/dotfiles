@@ -13,6 +13,7 @@ in
 
   programs.git.ignores = [
     ".clangd"
+    ".cache/clangd/"
     "compile_commands.json"
     "build"
   ];
