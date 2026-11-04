@@ -60,6 +60,11 @@ in
       # Software rendering avoids GPU load/glitches on large projects.
       "terminal.integrated.gpuAcceleration" = "off";
       "terminal.integrated.defaultProfile.linux" = "zsh";
+      # Plain zsh, no tmux: NO_TMUX skips the auto-attach in modules/terminal/zsh.nix.
+      "terminal.integrated.profiles.linux".zsh = {
+        path = "zsh";
+        env.NO_TMUX = "1";
+      };
       "terminal.integrated.initialHint" = false;
       "git.autofetch" = true;
       "git.openRepositoryInParentFolders" = "always";
