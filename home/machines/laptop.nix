@@ -64,6 +64,7 @@
     ../../modules/dev/markdown.nix
     ../../modules/dev/pre-commit.nix
     ../../modules/dev/godot.nix
+    ../../modules/dev/docker.nix
     ../../modules/dev/faster-whisper
   ];
 

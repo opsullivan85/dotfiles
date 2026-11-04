@@ -112,9 +112,6 @@ in
       tamasfe.even-better-toml
       jnoortheen.nix-ide
       pkief.material-icon-theme
-      ms-azuretools.vscode-containers
-      ms-azuretools.vscode-docker
-      ms-vscode-remote.remote-containers
       davidanson.vscode-markdownlint
       shd101wyy.markdown-preview-enhanced
       streetsidesoftware.code-spell-checker
