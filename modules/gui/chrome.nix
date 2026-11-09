@@ -1,12 +1,11 @@
 { pkgs, ... }:
 
 {
+  # Google Chrome on Linux rejects declarative extensions (Home Manager assertion),
+  # so Bitwarden is installed by hand from the Web Store.
   programs.chromium = {
     enable = true;
     package = pkgs.google-chrome;
-    extensions = [
-      { id = "nngceckbapebfimnlniiiahkandclblb"; } # Bitwarden
-    ];
   };
 
   # Web links (`open`/xdg-open, other apps' links) go to Chrome.
