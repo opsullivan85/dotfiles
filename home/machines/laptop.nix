@@ -38,7 +38,7 @@
     ../../modules/tui/yazi.nix
 
     ../../modules/gui/alacritty.nix
-    ../../modules/gui/brave.nix
+    ../../modules/gui/chrome.nix
     ../../modules/gui/imv.nix
     ../../modules/gui/mpv.nix
     ../../modules/gui/record.nix

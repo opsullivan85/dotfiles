@@ -7,7 +7,7 @@
 }:
 
 {
-  imports = [ ./brave.nix ];
+  imports = [ ./chrome.nix ];
 
   # nano is on by default and sets EDITOR=nano system-wide; editors come from
   # home-manager (modules/tui/nvim sets EDITOR).

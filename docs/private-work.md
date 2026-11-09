@@ -56,7 +56,7 @@ Note there is no always-on core: the private machine file lists everything it wa
        m.cli-gh
        m.tui-btop
        m.gui-alacritty
-       m.gui-brave
+       m.gui-chrome # Ubuntu: Chrome comes from apt, so set programs.chromium.package = null in work.nix
        m.tui-nvim
        m.dev-python
        m.dev-rust
