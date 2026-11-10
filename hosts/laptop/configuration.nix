@@ -80,6 +80,10 @@
   # (modules/terminal/zsh.nix) handles the actual rc content/plugins.
   programs.zsh.enable = true;
 
+  # faster-whisper-dictate: creates /dev/uinput (group uinput) for typing, and
+  # the "input" group lets it read keyboards from /dev/input for the hotkey.
+  hardware.uinput.enable = true;
+
   users.users."owen" = {
     isNormalUser = true;
     description = "Owen";
@@ -89,6 +93,8 @@
       "video"
       "docker" # root-equivalent: anyone in it can mount / into a container
       "wireshark" # lets dumpcap capture packets without sudo
+      "input" # read keyboards for faster-whisper-dictate's hotkey
+      "uinput" # write virtual keystrokes for faster-whisper-dictate
     ];
     shell = pkgs.zsh;
   };

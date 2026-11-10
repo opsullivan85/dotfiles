@@ -92,7 +92,9 @@
       # scripts/in-devshell). Enter with `nix develop`; hooks also re-enter
       # it on their own, so you never have to.
       devShells = forAllSystems (system: {
-        default = (pkgsFor system).mkShell {
+        # mkShellNoCC: mkShell pulls in stdenv's cc-wrapper, which shadows the
+        # system compiler (and ccache) for any build run inside this shell.
+        default = (pkgsFor system).mkShellNoCC {
           packages = with pkgsFor system; [
             pre-commit
             nixfmt

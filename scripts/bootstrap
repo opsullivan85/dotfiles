@@ -13,6 +13,7 @@ from collections.abc import Callable
 from pathlib import Path
 
 from dotlib import ui
+from dotlib.input_access import faster_whisper_uinput
 
 REPO = Path(__file__).resolve().parent.parent
 LOG = ui.new_log("bootstrap")
@@ -62,6 +63,7 @@ STEPS: list[tuple[str, Callable[[], Outcome]]] = [
     ("Git hooks", git_hooks),
     ("Rust toolchain", rust),
     ("GitHub login", github),
+    ("faster-whisper-dictate input", faster_whisper_uinput),
 ]
 
 

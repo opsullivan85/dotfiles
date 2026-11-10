@@ -35,16 +35,17 @@ in
       script = ./transcribe.py;
       libraries = [ faster-whisper ];
     }))
+    # Needs access to /dev/input (hotkey) and /dev/uinput (typing). Set up by
+    # hosts/laptop/configuration.nix on NixOS, or by scripts/bootstrap elsewhere.
     (withHostCuda "faster-whisper-dictate" (writePythonBin {
       name = "faster-whisper-dictate";
       script = ./dictate.py;
       libraries = [
         faster-whisper
-        pkgs.python3Packages.pynput
+        pkgs.python3Packages.evdev
       ];
       replacements = {
         "@FFMPEG@" = "${pkgs.ffmpeg}/bin/ffmpeg";
-        "@XDOTOOL@" = "${pkgs.xdotool}/bin/xdotool";
       };
     }))
   ];
