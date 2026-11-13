@@ -51,6 +51,16 @@ in
       bind j select-pane -D
       bind k select-pane -U
       bind l select-pane -R
+
+      # Vim-style copy-mode (vi keys come from keyMode above). Stock tmux
+      # binds v to rectangle-toggle and leaves y unbound. y/Y also send the
+      # selection to the system clipboard via `copy` (see modules/cli/copy.nix),
+      # not only to tmux's paste buffer.
+      bind -T copy-mode-vi v send -X begin-selection
+      bind -T copy-mode-vi V send -X select-line
+      bind -T copy-mode-vi C-v send -X rectangle-toggle
+      bind -T copy-mode-vi y send -X copy-pipe-and-cancel "copy"
+      bind -T copy-mode-vi Y send -X select-line \; send -X copy-pipe-and-cancel "copy"
     '';
   };
 }
