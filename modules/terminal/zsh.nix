@@ -1,4 +1,4 @@
-_:
+{ pkgs, ... }:
 
 {
   # `z` and `zi` (interactive picker, needs fzf) jump to recent directories.
@@ -10,6 +10,17 @@ _:
     enableCompletion = true;
     autosuggestion.enable = true;
     syntaxHighlighting.enable = true;
+
+    # Alt+Left / Alt+Right step back and forward through visited directories.
+    # The plugin also binds Alt+Up (cd ..) and Alt+Down (first child directory).
+    # Taken from oh-my-zsh's plugin folder, so nothing is vendored here.
+    plugins = [
+      {
+        name = "dirhistory";
+        src = pkgs.oh-my-zsh;
+        file = "share/oh-my-zsh/plugins/dirhistory/dirhistory.plugin.zsh";
+      }
+    ];
 
     history = {
       size = 50000;
