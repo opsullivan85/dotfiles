@@ -32,6 +32,7 @@
     ../../modules/tui/btop.nix
     ../../modules/tui/chat.nix
     ../../modules/tui/claude-code.nix
+    ../../modules/tui/diffview.nix
     ../../modules/tui/jn.nix
     ../../modules/tui/keifu.nix
     ../../modules/tui/nvim
